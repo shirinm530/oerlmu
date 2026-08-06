@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intermediate Microeconomics — Demand Toolkit</title>
+<style>
+  :root{
+    --acc:#4F46E5; --acc-d:#3730A3; --acc-t:#EEF2FF;
+    --pos:#0F766E; --neg:#B91C1C; --gold:#B45309;
+    --ink:#0F172A; --body:#334155; --slate:#64748B; --mut:#94A3B8;
+    --paper:#F6F7FB; --card:#FFFFFF; --line:#E5E9F0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:22px 18px 40px;}
+  .title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .tabs{display:flex;gap:6px;margin:12px 0 4px;flex-wrap:wrap;}
+  .tab{border:1.5px solid var(--line);background:#fff;border-radius:11px 11px 0 0;padding:10px 16px;
+    font-size:13.5px;font-weight:800;cursor:pointer;color:var(--slate);transition:.15s;border-bottom:none;}
+  .tab.on{background:var(--acc);color:#fff;border-color:var(--acc);}
+  .pane{display:none;} .pane.on{display:block;}
+  .hd{border-left:5px solid var(--acc);padding:1px 0 1px 15px;margin-bottom:4px;}
+  .kicker{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd h1{font-size:21px;line-height:1.2;margin-top:2px;font-weight:800;}
+  .lede{font-size:14px;color:var(--body);margin:9px 0 2px;max-width:730px;}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:14px;}
+  @media(max-width:740px){.grid,.grid2{grid-template-columns:1fr;}}
+  .card{background:var(--card);border-radius:14px;padding:16px 18px;border:1px solid var(--line);}
+  .card h3{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#7A88A0;margin-bottom:10px;font-weight:800;}
+  svg{width:100%;height:auto;display:block;}
+  .ctl{margin:9px 0;}
+  .ctl label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px;}
+  .ctl label b{color:var(--acc);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;-webkit-appearance:none;height:7px;border-radius:7px;background:var(--line);outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:23px;height:23px;border-radius:50%;
+    background:#fff;border:4px solid var(--acc);cursor:pointer;box-shadow:0 2px 7px rgba(15,23,42,.22);}
+  input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid var(--acc);cursor:pointer;}
+  .stats{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:60px;background:var(--paper);border-radius:10px;padding:9px 4px;text-align:center;}
+  .stat .big{font-size:18px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
+  .stat .lab{font-size:9px;color:var(--slate);text-transform:uppercase;letter-spacing:.02em;margin-top:3px;font-weight:700;}
+  .note{margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--acc-t);font-size:12px;text-align:center;font-weight:700;color:var(--acc-d);font-variant-numeric:tabular-nums;}
+  .callout{margin-top:10px;padding:11px 13px;border-radius:10px;background:var(--paper);font-size:12.5px;color:var(--body);min-height:60px;}
+  .callout b{color:var(--ink);}
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+  .preset{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:6px 11px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--ink);transition:.15s;}
+  .preset:hover{border-color:var(--acc);background:var(--acc);color:#fff;}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--slate);margin-top:6px;font-weight:700;}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
+  .foot{font-size:11px;color:var(--mut);margin-top:18px;text-align:center;}
+  .toggle-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .tog{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:6px 13px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--slate);transition:.15s;}
+  .tog.on{background:var(--acc);color:#fff;border-color:var(--acc);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">Intermediate Microeconomics · Demand Toolkit</div>
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-tab="md">Individual &amp; Market Demand</div>
+    <div class="tab" data-tab="sh">Movements &amp; Shifts</div>
+    <div class="tab" data-tab="ie">Income &amp; Substitution Effects</div>
+  </div>
+
+  <!-- ============ TAB 1 ============ -->
+  <section class="pane on" data-pane="md" id="pane-md">
+    <div class="hd"><div class="kicker">Demand Theory</div><h1>Individual &amp; Market Demand: Horizontal Summation</h1></div>
+    <p class="lede">Each consumer has their own demand curve. The <b>market demand curve</b> is found by adding quantities demanded at each price — a <em>horizontal sum</em>. When consumers have different choke prices the market curve has <b>kinks</b>.</p>
+    <div class="grid2">
+      <div class="card"><h3>Individual demand curves</h3>
+        <svg data-el="indPlot" viewBox="0 0 480 320" role="img" aria-label="Individual demand curves"></svg>
+        <div class="legend">
+          <span><i style="background:#4F46E5"></i>Consumer A</span>
+          <span><i style="background:#0F766E"></i>Consumer B</span>
+          <span><i style="background:#B45309"></i>Consumer C</span>
+          <span><i style="background:#B91C1C;opacity:.6"></i>Price</span>
+        </div>
+      </div>
+      <div class="card"><h3>Market demand curve (horizontal sum)</h3>
+        <svg data-el="mktPlot" viewBox="0 0 480 320" role="img" aria-label="Market demand curve"></svg>
+        <div class="legend">
+          <span><i style="background:#4F46E5"></i>D<sub>market</sub></span>
+          <span><i style="background:#B91C1C;opacity:.6"></i>Price</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid" style="margin-top:12px;">
+      <div class="card"><h3>Controls</h3>
+        <div class="ctl"><label><span>Price (P)</span><b data-el="prL">50</b></label><input type="range" data-el="pr" min="5" max="95" value="50" step="1"></div>
+        <div class="ctl"><label><span>Consumer A — preference (a<sub>A</sub>)</span><b data-el="aaL">1.0</b></label><input type="range" data-el="aa" min="0.4" max="2.0" value="1.0" step="0.1"></div>
+        <div class="ctl"><label><span>Consumer B — preference (a<sub>B</sub>)</span><b data-el="abL">1.0</b></label><input type="range" data-el="ab" min="0.4" max="2.0" value="1.0" step="0.1"></div>
+        <div class="ctl"><label><span>Consumer C — preference (a<sub>C</sub>)</span><b data-el="acL">1.0</b></label><input type="range" data-el="ac" min="0.4" max="2.0" value="1.0" step="0.1"></div>
+        <div class="ctl"><label><span>Number of buyers (N)</span><b data-el="nbL">3</b></label><input type="range" data-el="nb" min="1" max="10" value="3" step="1"></div>
+      </div>
+      <div class="card"><h3>Quantities at current price</h3>
+        <div class="stats">
+          <div class="stat"><div class="big" data-el="qaV" style="color:#4F46E5">–</div><div class="lab">Q<sub>A</sub></div></div>
+          <div class="stat"><div class="big" data-el="qbV" style="color:#0F766E">–</div><div class="lab">Q<sub>B</sub></div></div>
+          <div class="stat"><div class="big" data-el="qcV" style="color:#B45309">–</div><div class="lab">Q<sub>C</sub></div></div>
+          <div class="stat"><div class="big" data-el="qtV" style="color:var(--ink)">–</div><div class="lab">Q<sub>market</sub></div></div>
+        </div>
+        <div class="note" data-el="sumNote">–</div>
+        <div class="callout" data-el="callout">Market demand is the <b>horizontal sum</b> of individual demands: at every price, add up how much each consumer wants to buy. The market curve has kinks where consumers' choke prices differ — at high prices only low-choke-price consumers participate.</div>
+        <div class="presets" data-el="presets"></div>
+      </div>
+    </div>
+    <div class="foot">Individual demands: Q<sub>i</sub>(P) = aᵢ·max(0, P̄ᵢ − P). Consumer choke prices: P̄<sub>A</sub> = 100·a<sub>A</sub>, P̄<sub>B</sub> = 80·a<sub>B</sub>, P̄<sub>C</sub> = 60·a<sub>C</sub>. Market D = N·ΣQᵢ.</div>
+  </section>
+
+  <!-- ============ TAB 2 ============ -->
+  <section class="pane" data-pane="sh" id="pane-sh">
+    <div class="hd"><div class="kicker">Demand Analysis</div><h1>Movement Along vs. Shift of the Demand Curve</h1></div>
+    <p class="lede">A change in the good's own <b>price</b> moves you <em>along</em> the demand curve. A change in <b>income, tastes, or related-good prices</b> shifts the entire curve to a new position D₁.</p>
+    <div class="grid">
+      <div class="card"><h3>Demand curve: D₀ and D₁</h3>
+        <svg data-el="shPlot" viewBox="0 0 500 360" role="img" aria-label="Demand curve showing movement or shift"></svg>
+        <div class="legend">
+          <span><i style="background:#94A3B8"></i>D₀ (original)</span>
+          <span><i style="background:#4F46E5"></i>D₁ (current)</span>
+          <span><i style="background:#B45309"></i>Current point</span>
+        </div>
+      </div>
+      <div class="card"><h3>Controls</h3>
+        <div class="ctl"><label><span>Price of good (P)</span><b data-el="spL">50</b></label><input type="range" data-el="sp" min="5" max="95" value="50" step="1"></div>
+        <div class="ctl"><label><span>Income (M)</span><b data-el="smL">100</b></label><input type="range" data-el="sm" min="40" max="200" value="100" step="5"></div>
+        <div class="ctl"><label><span>Tastes / preference (T)</span><b data-el="stL">1.0</b></label><input type="range" data-el="st" min="0.4" max="2.0" value="1.0" step="0.1"></div>
+        <div class="ctl"><label><span>Price of substitute (P<sub>sub</sub>)</span><b data-el="ssL">50</b></label><input type="range" data-el="ss" min="10" max="100" value="50" step="1"></div>
+        <div class="ctl"><label><span>Price of complement (P<sub>com</sub>)</span><b data-el="scL">50</b></label><input type="range" data-el="sc" min="10" max="100" value="50" step="1"></div>
+        <div class="ctl"><label><span>Number of buyers (N)</span><b data-el="snL">100</b></label><input type="range" data-el="sn" min="20" max="200" value="100" step="5"></div>
+        <div class="stats">
+          <div class="stat"><div class="big" data-el="sqV" style="color:var(--acc)">–</div><div class="lab">Q demanded</div></div>
+          <div class="stat"><div class="big" data-el="sshiftV" style="color:var(--ink)">–</div><div class="lab">Curve shift</div></div>
+        </div>
+        <div class="note" data-el="shNote">–</div>
+        <div class="callout" data-el="callout"></div>
+        <div class="presets" data-el="presets"></div>
+      </div>
+    </div>
+    <div class="foot">Q = T·(M/100)·(100−P)/10 + 0.3·(P<sub>sub</sub>−50)/10 − 0.3·(P<sub>com</sub>−50)/10, scaled by N/100.</div>
+  </section>
+
+  <!-- ============ TAB 3 ============ -->
+  <section class="pane" data-pane="ie" id="pane-ie">
+    <div class="hd"><div class="kicker">Slutsky Decomposition</div><h1>Income &amp; Substitution Effects</h1></div>
+    <p class="lede">When the price of X falls, two things happen: X is <b>relatively cheaper</b> (substitution effect) and the consumer's <b>real purchasing power rises</b> (income effect). Their sum is the total effect.</p>
+    <div class="grid">
+      <div class="card"><h3>Budget lines &amp; indifference curves</h3>
+        <svg data-el="iePlot" viewBox="0 0 500 480" role="img" aria-label="Income and substitution effects diagram"></svg>
+        <div class="legend">
+          <span><i style="background:#94A3B8"></i>Original BL₀ (A)</span>
+          <span><i style="background:#4F46E5"></i>New BL₁ (C)</span>
+          <span><i style="background:#0F766E"></i>Compensated BLc (B)</span>
+        </div>
+      </div>
+      <div class="card"><h3>Controls</h3>
+        <div class="ctl"><label><span>Price of X — original (p₀)</span><b data-el="p0L">4.0</b></label><input type="range" data-el="p0" min="1" max="10" value="4" step="0.5"></div>
+        <div class="ctl"><label><span>Price of X — new (p₁)</span><b data-el="p1L">2.0</b></label><input type="range" data-el="p1" min="0.5" max="9.5" value="2" step="0.5"></div>
+        <div class="ctl"><label><span>Income (M)</span><b data-el="imL">80</b></label><input type="range" data-el="im" min="40" max="160" value="80" step="5"></div>
+        <div class="ctl"><label><span>Taste for X (α)</span><b data-el="iaL">0.50</b></label><input type="range" data-el="ia" min="0.15" max="0.85" value="0.5" step="0.05"></div>
+        <div class="toggle-row">
+          <button class="tog on" data-good="normal">Normal Good</button>
+          <button class="tog" data-good="inferior">Inferior Good</button>
+          <button class="tog" data-good="giffen">Giffen Good</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="big" data-el="subE" style="color:#0F766E">–</div><div class="lab">Subst. effect ΔX<sub>SE</sub></div></div>
+          <div class="stat"><div class="big" data-el="incE" style="color:#B45309">–</div><div class="lab">Income effect ΔX<sub>IE</sub></div></div>
+          <div class="stat"><div class="big" data-el="totE" style="color:var(--acc)">–</div><div class="lab">Total effect ΔX</div></div>
+        </div>
+        <div class="note" data-el="ieNote">–</div>
+        <div class="callout" data-el="callout"></div>
+        <div class="presets" data-el="presets"></div>
+      </div>
+    </div>
+    <div class="foot">
+      Normal: Cobb–Douglas U=X<sup>α</sup>Y<sup>1−α</sup>. Inferior/Giffen: quasi-linear with income-dependent demand for X. Slutsky compensation: M<sub>c</sub>=p₁·X*+p<sub>Y</sub>·Y*.
+    </div>
+  </section>
+
+  <div class="foot" style="margin-top:22px;border-top:1px solid var(--line);padding-top:12px;">
+    Open interactive toolkit for intermediate microeconomics · <b>CC BY 4.0</b> — use, embed, and adapt freely with attribution.
+  </div>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function mk(svg){
+  return (t,at)=>{
+    let e=document.createElementNS(NS,t);
+    for(let k in at) e.setAttribute(k,at[k]);
+    svg.appendChild(e);
+    return e;
+  };
+}
+function svgTxt(el,x,y,str,opts){
+  const e=el('text',Object.assign({x,y,'font-size':11.5,fill:'#64748B','font-weight':700,
+    'font-family':'-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif'},opts||{}));
+  e.textContent=str; return e;
+}
+function axisArrow(el,x,y,dir){
+  if(dir==='right') el('path',{d:`M${x} ${y} l-8 -4 l0 8 z`,fill:'#0F172A'});
+  else              el('path',{d:`M${x} ${y} l-5 8 l10 0 z`,fill:'#0F172A'});
+}
+function niceTick(raw){
+  if(raw<=0) return 1;
+  const mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const frac=raw/mag;
+  if(frac<1.5) return mag;
+  if(frac<3)   return 2*mag;
+  if(frac<7)   return 5*mag;
+  return 10*mag;
+}
+function fmtQ(v){
+  if(v===undefined||isNaN(v)) return '0';
+  if(v>=1000) return Math.round(v/100)*100+'';
+  if(v>=100)  return Math.round(v/10)*10+'';
+  if(v>=10)   return Math.round(v)+'';
+  if(v>=1)    return v.toFixed(1);
+  return v.toFixed(2);
+}
+
+/* ============================================================
+   TAB 1
+   ============================================================ */
+(function(){
+  const root=document.getElementById('pane-md');
+  const $=s=>root.querySelector('[data-el="'+s+'"]');
+  const svgI=$('indPlot'), svgM=$('mktPlot');
+  const elI=mk(svgI), elM=mk(svgM);
+  const LI=44,RI=462,TI=16,BI=295;
+  const LM=44,RM=462,TM=16,BM=295;
+  const PMAX=110;
+  let PR=50, AA=1.0, AB=1.0, AC=1.0, NB=3;
+  const PBAR=[100,80,60];
+  function qInd(i,a,p){ return Math.max(0, a*(PBAR[i]-p)); }
+  function qMkt(p){ return NB*(qInd(0,AA,p)+qInd(1,AB,p)+qInd(2,AC,p)); }
+  function qIndMax(i,a){ return a*PBAR[i]; }
+  function pxI(q,QIMAX){ return LI+(q/QIMAX)*(RI-LI); }
+  function pyI(p){ return BI-(p/PMAX)*(BI-TI); }
+  function drawIndividual(){
+    svgI.innerHTML='';
+    const QIMAX=Math.max(qIndMax(0,AA),qIndMax(1,AB),qIndMax(2,AC),2)*1.15;
+    const pticks=[20,40,60,80,100];
+    pticks.forEach(p=>{
+      elI('line',{x1:LI,y1:pyI(p),x2:RI,y2:pyI(p),stroke:'#E5E9F0','stroke-width':1});
+      svgTxt(elI,LI-5,pyI(p)+4,p,{'text-anchor':'end','font-size':10,fill:'#94A3B8'});
+    });
+    const qStep=niceTick(QIMAX/4);
+    for(let q=qStep;q<QIMAX;q+=qStep){
+      const x=pxI(q,QIMAX);
+      elI('line',{x1:x,y1:BI,x2:x,y2:BI+4,stroke:'#94A3B8','stroke-width':1});
+      svgTxt(elI,x,BI+14,fmtQ(q),{'text-anchor':'middle','font-size':9.5,fill:'#94A3B8'});
+    }
+    elI('line',{x1:LI,y1:BI,x2:RI,y2:BI,stroke:'#0F172A','stroke-width':2});
+    elI('line',{x1:LI,y1:BI,x2:LI,y2:TI,stroke:'#0F172A','stroke-width':2});
+    axisArrow(elI,RI,BI,'right');
+    axisArrow(elI,LI,TI,'up');
+    svgTxt(elI,RI-2,BI+22,'Quantity',{'text-anchor':'end','font-size':12,fill:'#334155'});
+    svgTxt(elI,LI-2,TI-4,'Price',{'text-anchor':'middle','font-size':12,fill:'#334155'});
+    const colors=['#4F46E5','#0F766E','#B45309'];
+    const params=[AA,AB,AC];
+    const labels=['A','B','C'];
+    params.forEach((a,i)=>{
+      const qmax=qIndMax(i,a);
+      const pbar=PBAR[i];
+      elI('line',{x1:pxI(0,QIMAX),y1:pyI(pbar),x2:pxI(qmax,QIMAX),y2:pyI(0),
+        stroke:colors[i],'stroke-width':2.5,'stroke-linecap':'round'});
+      svgTxt(elI,LI-2,pyI(pbar),labels[i],{fill:colors[i],'font-size':11,'text-anchor':'end','font-weight':800});
+    });
+    elI('line',{x1:LI,y1:pyI(PR),x2:RI,y2:pyI(PR),stroke:'#B91C1C','stroke-width':1.8,'stroke-dasharray':'6 4'});
+    svgTxt(elI,LI+22,pyI(PR)-6,'P = '+PR,{fill:'#B91C1C','font-size':10,'font-weight':800});
+    params.forEach((a,i)=>{
+      const q=qInd(i,a,PR);
+      if(q>0.01){
+        const cx=pxI(q,QIMAX), cy=pyI(PR);
+        elI('line',{x1:cx,y1:cy,x2:cx,y2:BI,stroke:colors[i],'stroke-width':1.2,'stroke-dasharray':'3 3',opacity:0.55});
+        elI('circle',{cx,cy,r:4.5,fill:colors[i],stroke:'#fff','stroke-width':2});
+      }
+    });
+  }
+  function pxM(q,QMMAX){ return LM+(q/QMMAX)*(RM-LM); }
+  function pyM(p){ return BM-(p/PMAX)*(BM-TM); }
+  function drawMarket(){
+    svgM.innerHTML='';
+    const kinkPrices=[PBAR[0],PBAR[1],PBAR[2],0].filter((v,i,a)=>a.indexOf(v)===i).sort((a,b)=>b-a);
+    const QMMAX=Math.max(qMkt(0),1)*1.15;
+    const pticks=[20,40,60,80,100];
+    pticks.forEach(p=>{
+      elM('line',{x1:LM,y1:pyM(p),x2:RM,y2:pyM(p),stroke:'#E5E9F0','stroke-width':1});
+      svgTxt(elM,LM-5,pyM(p)+4,p,{'text-anchor':'end','font-size':10,fill:'#94A3B8'});
+    });
+    const qStep=niceTick(QMMAX/4);
+    for(let q=qStep;q<QMMAX;q+=qStep){
+      const x=pxM(q,QMMAX);
+      elM('line',{x1:x,y1:BM,x2:x,y2:BM+4,stroke:'#94A3B8','stroke-width':1});
+      svgTxt(elM,x,BM+14,fmtQ(q),{'text-anchor':'middle','font-size':9.5,fill:'#94A3B8'});
+    }
+    elM('line',{x1:LM,y1:BM,x2:RM,y2:BM,stroke:'#0F172A','stroke-width':2});
+    elM('line',{x1:LM,y1:BM,x2:LM,y2:TM,stroke:'#0F172A','stroke-width':2});
+    axisArrow(elM,RM,BM,'right');
+    axisArrow(elM,LM,TM,'up');
+    svgTxt(elM,RM-2,BM+22,'Quantity',{'text-anchor':'end','font-size':12,fill:'#334155'});
+    svgTxt(elM,LM-2,TM-4,'Price',{'text-anchor':'middle','font-size':12,fill:'#334155'});
+    const allP=[PMAX,...kinkPrices];
+    let polyPts=[];
+    allP.forEach(p=>{
+      const q=Math.min(qMkt(p),QMMAX);
+      polyPts.push([pxM(Math.max(q,0),QMMAX),pyM(p)]);
+    });
+    polyPts.push([pxM(Math.min(qMkt(0),QMMAX),QMMAX),pyM(0)]);
+    const dPath=polyPts.map((pt,i)=>(i?'L':'M')+pt[0].toFixed(1)+' '+pt[1].toFixed(1)).join(' ');
+    elM('path',{d:dPath,fill:'none',stroke:'#4F46E5','stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round'});
+    kinkPrices.forEach(p=>{
+      const q=qMkt(p);
+      if(q>=0) elM('circle',{cx:pxM(Math.min(q,QMMAX),QMMAX),cy:pyM(p),r:4,fill:'#4F46E5',stroke:'#fff','stroke-width':1.8,opacity:0.8});
+    });
+    const midP=30;
+    const midQ=Math.min(qMkt(midP),QMMAX);
+    svgTxt(elM,pxM(midQ,QMMAX)+10,pyM(midP),'Dₘ',{fill:'#4F46E5','font-size':13,'font-weight':800,'text-anchor':'start'});
+    const qAtPR=Math.min(qMkt(PR),QMMAX);
+    elM('line',{x1:LM,y1:pyM(PR),x2:RM,y2:pyM(PR),stroke:'#B91C1C','stroke-width':1.8,'stroke-dasharray':'6 4'});
+    svgTxt(elM,LM+22,pyM(PR)-6,'P = '+PR,{fill:'#B91C1C','font-size':10,'font-weight':800});
+    if(qAtPR>=0){
+      const cx=pxM(qAtPR,QMMAX);
+      elM('line',{x1:cx,y1:pyM(PR),x2:cx,y2:BM,stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      elM('circle',{cx,cy:pyM(PR),r:6,fill:'#4F46E5',stroke:'#fff','stroke-width':2.5});
+      svgTxt(elM,cx,BM+26,fmtQ(qAtPR),{'text-anchor':'middle','font-size':10,fill:'#0F172A','font-weight':800});
+    }
+  }
+  function draw(){
+    drawIndividual();
+    drawMarket();
+    const qa=qInd(0,AA,PR), qb=qInd(1,AB,PR), qc=qInd(2,AC,PR);
+    const qt=NB*(qa+qb+qc);
+    $('qaV').textContent=fmtQ(qa);
+    $('qbV').textContent=fmtQ(qb);
+    $('qcV').textContent=fmtQ(qc);
+    $('qtV').textContent=fmtQ(qt);
+    $('sumNote').innerHTML=`Q<sub>market</sub> = ${NB} × (${fmtQ(qa)} + ${fmtQ(qb)} + ${fmtQ(qc)}) = <b>${fmtQ(qt)}</b>`;
+  }
+  function bind(name,set,fmt){
+    const inp=$(name);
+    inp.addEventListener('input',e=>{
+      set(+e.target.value);
+      $(name+'L').textContent=fmt?fmt(+e.target.value):e.target.value;
+      draw();
+    });
+  }
+  bind('pr',v=>PR=v);
+  bind('aa',v=>AA=v,v=>v.toFixed(1));
+  bind('ab',v=>AB=v,v=>v.toFixed(1));
+  bind('ac',v=>AC=v,v=>v.toFixed(1));
+  bind('nb',v=>NB=v);
+  [['Reset',50,1.0,1.0,1.0,3],
+   ['High price',80,1.0,1.0,1.0,3],
+   ['Unequal tastes',50,0.5,1.0,1.8,3],
+   ['More buyers',50,1.0,1.0,1.0,8],
+   ['Low price',15,1.0,1.0,1.0,3]
+  ].forEach(p=>{
+    let b=document.createElement('button');b.className='preset';b.textContent=p[0];
+    b.onclick=()=>{
+      PR=p[1];AA=p[2];AB=p[3];AC=p[4];NB=p[5];
+      $('pr').value=PR;$('aa').value=AA;$('ab').value=AB;$('ac').value=AC;$('nb').value=NB;
+      $('prL').textContent=PR;
+      $('aaL').textContent=AA.toFixed(1);$('abL').textContent=AB.toFixed(1);$('acL').textContent=AC.toFixed(1);
+      $('nbL').textContent=NB;
+      draw();
+    };
+    $('presets').appendChild(b);
+  });
+  draw();
+  root.__draw=draw;
+})();
+
+/* ============================================================
+   TAB 2
+   ============================================================ */
+(function(){
+  const root=document.getElementById('pane-sh');
+  const $=s=>root.querySelector('[data-el="'+s+'"]');
+  const svg=$('shPlot'), el=mk(svg);
+  const L=50,R=488,T=18,B=330,PMAX=100,QMAX=22;
+  let SP=50,SM=100,ST=1.0,SS=50,SC=50,SN=100;
+  const BASE={M:100,T:1.0,S:50,C:50,N:100};
+  function qDem(P,M,T,S,C,N){
+    return Math.max(0,(T*(M/100)*(100-P)/10 + 0.3*(S-50)/10 - 0.3*(C-50)/10)*(N/100));
+  }
+  function demLine(M,T,S,C,N){
+    const shift=(0.3*(S-50)/10 - 0.3*(C-50)/10)*(N/100);
+    const slope=T*(M/100)/10*(N/100);
+    const pInt = slope>0 ? 100 + shift/slope : PMAX;
+    const qInt = slope*100 + shift;
+    return {slope, shift, pInt:Math.min(pInt,PMAX), qInt:Math.max(qInt,0)};
+  }
+  function qOnLine(P, lineObj){
+    const q = lineObj.slope*(100-P) + lineObj.shift;
+    return Math.max(0, Math.min(q, QMAX));
+  }
+  const PX=q=>L+(q/QMAX)*(R-L);
+  const PY=p=>B-(p/PMAX)*(B-T);
+  function draw(){
+    svg.innerHTML='';
+    [20,40,60,80,100].forEach(p=>{
+      el('line',{x1:L,y1:PY(p),x2:R,y2:PY(p),stroke:'#E5E9F0','stroke-width':1});
+      svgTxt(el,L-5,PY(p)+4,p,{'text-anchor':'end','font-size':10,fill:'#94A3B8'});
+    });
+    [5,10,15,20].forEach(q=>{
+      const x=PX(q);
+      el('line',{x1:x,y1:B,x2:x,y2:B+4,stroke:'#94A3B8','stroke-width':1});
+      svgTxt(el,x,B+14,q,{'text-anchor':'middle','font-size':9.5,fill:'#94A3B8'});
+    });
+    el('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+    el('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+    axisArrow(el,R,B,'right');
+    axisArrow(el,L,T,'up');
+    svgTxt(el,R-2,B+22,'Quantity',{'text-anchor':'end','font-size':12,fill:'#334155'});
+    svgTxt(el,L-2,T-4,'Price',{'text-anchor':'middle','font-size':12,fill:'#334155'});
+    const d0=demLine(BASE.M,BASE.T,BASE.S,BASE.C,BASE.N);
+    const d0x1=PX(0), d0y1=PY(Math.min(d0.pInt,PMAX));
+    let d0x2,d0y2;
+    if(d0.slope>0 && d0.qInt>QMAX){
+      const pAtQmax=100-(QMAX-d0.shift)/d0.slope;
+      d0x2=PX(QMAX); d0y2=PY(Math.max(0,pAtQmax));
+    } else {
+      d0x2=PX(Math.min(d0.qInt,QMAX)); d0y2=PY(0);
+    }
+    el('line',{x1:d0x1,y1:d0y1,x2:d0x2,y2:d0y2,
+      stroke:'#94A3B8','stroke-width':2.2,'stroke-dasharray':'7 5','stroke-linecap':'round'});
+    svgTxt(el,d0x1+6,d0y1-8,'D₀',{fill:'#94A3B8','font-size':13,'font-weight':800});
+    const d1=demLine(SM,ST,SS,SC,SN);
+    let d1x1=PX(0), d1y1=PY(Math.min(d1.pInt,PMAX));
+    let d1x2,d1y2;
+    if(d1.slope>0 && d1.qInt>QMAX){
+      const pAtQmax=100-(QMAX-d1.shift)/d1.slope;
+      d1x2=PX(QMAX); d1y2=PY(Math.max(0,pAtQmax));
+    } else {
+      d1x2=PX(Math.min(d1.qInt,QMAX)); d1y2=PY(0);
+    }
+    el('line',{x1:d1x1,y1:d1y1,x2:d1x2,y2:d1y2,
+      stroke:'#4F46E5','stroke-width':3,'stroke-linecap':'round'});
+    svgTxt(el,d1x1+6,d1y1-8,'D₁',{fill:'#4F46E5','font-size':13,'font-weight':800});
+    const midP=50;
+    const q0mid=qOnLine(midP,d0);
+    const q1mid=qOnLine(midP,d1);
+    const shiftAmt=qDem(midP,SM,ST,SS,SC,SN)-qDem(midP,BASE.M,BASE.T,BASE.S,BASE.C,BASE.N);
+    if(Math.abs(q1mid-q0mid)>0.3){
+      const ay=PY(midP);
+      const ax1=PX(q0mid);
+      const ax2=PX(q1mid);
+      el('line',{x1:ax1,y1:ay,x2:ax2,y2:ay,stroke:'#6366F1','stroke-width':2,'stroke-dasharray':'4 3'});
+      el('path',{d:`M${ax2} ${ay} l${ax2>ax1?-7:7} -3.5 l0 7 z`,fill:'#6366F1'});
+    }
+    const q=qOnLine(SP,d1);
+    const cx=PX(q), cy=PY(SP);
+    el('line',{x1:L,y1:cy,x2:cx,y2:cy,stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+    el('line',{x1:cx,y1:B,x2:cx,y2:cy,stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+    el('circle',{cx,cy,r:7,fill:'#B45309',stroke:'#fff','stroke-width':2.5});
+    svgTxt(el,L-5,cy+4,SP,{'text-anchor':'end','font-size':9.5,fill:'#B45309'});
+    svgTxt(el,cx,B+26,q.toFixed(1),{'text-anchor':'middle','font-size':9.5,fill:'#B45309'});
+    $('sqV').textContent=Math.max(0,q).toFixed(1);
+    $('sshiftV').textContent=(Math.abs(shiftAmt)<0.05?'0':(shiftAmt>0?'+':'')+shiftAmt.toFixed(1));
+    const shifted=Math.abs(shiftAmt)>0.05;
+    if(shifted){
+      const dir=shiftAmt>0?'rightward (increase)':'leftward (decrease)';
+      $('shNote').innerHTML=`D₁ shifts <b>${dir}</b> — the whole curve moved`;
+      $('callout').innerHTML=`<b>Shift of demand.</b> You changed a non-price determinant (income, tastes, related prices, or number of buyers). The <em>entire</em> curve moved ${shiftAmt>0?'right — more is demanded at every price':'left — less is demanded at every price'}.`;
+    } else {
+      $('shNote').innerHTML=`Moving <b>along D₁</b> — only own price changed`;
+      $('callout').innerHTML=`<b>Movement along the demand curve.</b> Only the good's own price changed. The orange dot slides up or down D₁ — no shift occurs. Quantity demanded changes but the curve stays put.`;
+    }
+  }
+  function bind(name,set,fmt){
+    const inp=$(name);
+    inp.addEventListener('input',e=>{
+      set(+e.target.value);
+      $(name+'L').textContent=fmt?fmt(+e.target.value):e.target.value;
+      draw();
+    });
+  }
+  bind('sp',v=>SP=v);
+  bind('sm',v=>SM=v);
+  bind('st',v=>ST=v,v=>v.toFixed(1));
+  bind('ss',v=>SS=v);
+  bind('sc',v=>SC=v);
+  bind('sn',v=>SN=v);
+  [['Reset',50,100,1.0,50,50,100],
+   ['Price rise',80,100,1.0,50,50,100],
+   ['Income up',50,160,1.0,50,50,100],
+   ['Sub. cheaper',50,100,1.0,20,50,100],
+   ['Comp. costlier',50,100,1.0,50,85,100],
+   ['More buyers',50,100,1.0,50,50,180]
+  ].forEach(p=>{
+    let b=document.createElement('button');b.className='preset';b.textContent=p[0];
+    b.onclick=()=>{
+      SP=p[1];SM=p[2];ST=p[3];SS=p[4];SC=p[5];SN=p[6];
+      $('sp').value=SP;$('sm').value=SM;$('st').value=ST;$('ss').value=SS;$('sc').value=SC;$('sn').value=SN;
+      $('spL').textContent=SP;$('smL').textContent=SM;$('stL').textContent=ST.toFixed(1);
+      $('ssL').textContent=SS;$('scL').textContent=SC;$('snL').textContent=SN;
+      draw();
+    };
+    $('presets').appendChild(b);
+  });
+  draw();
+  root.__draw=draw;
+})();
+
+/* ============================================================
+   TAB 3 — INCOME & SUBSTITUTION EFFECTS
+   Slutsky decomposition: recomputed from scratch on every change.
+
+   NORMAL GOOD: Cobb-Douglas U = x^alpha * y^(1-alpha)
+     xA = alpha*M/p0,  yA = (1-alpha)*M/pY
+     Mc = p1*xA + pY*yA  (Slutsky compensation)
+     xB = alpha*Mc/p1    (compensated optimum, same alpha)
+     xC = alpha*M/p1     (final optimum)
+     SE = xB-xA > 0,  IE = xC-xB > 0,  TE = xC-xA > 0
+     Ordering: xA < xB < xC
+
+   INFERIOR GOOD:
+     Use quasi-linear-style demand where X has a declining
+     marginal utility of income. We model this with a demand
+     function that explicitly has a negative income effect:
+       xA = alpha*M/p0
+       xB = alpha*Mc/p1        (SE: same demand structure, new price)
+       xC = alpha*M/p1 - k*(M/pY)   where k>0 captures inferiority
+     This ensures xC < xB (negative IE) but xC > xA (TE > 0).
+
+     Concrete implementation: use two separate utility parameters.
+     At bundle A: use alpha for X share.
+     Slutsky compensation gives Mc.
+     Bundle B: use alpha (same preferences) at p1, Mc.
+     Bundle C: use alpha_c < alpha (lower share at higher real income)
+       alpha_c = alpha * (p1/p0)^phi   with phi in (0,1)
+       When p1 < p0: alpha_c < alpha → xC uses smaller share.
+       xC = alpha_c * M / p1
+     This gives:
+       SE = xB - xA = alpha*(Mc/p1 - M/p0) > 0 always
+       IE = xC - xB = alpha_c*M/p1 - alpha*Mc/p1
+          = (alpha_c*M - alpha*Mc)/p1
+          < 0 when alpha_c*M < alpha*Mc
+       TE = xC - xA
+
+   GIFFEN GOOD:
+     Same structure as inferior but with stronger income effect:
+       alpha_c = alpha * (p1/p0)^phi_g   with phi_g > phi
+       and an additional necessity adjustment so |IE| > SE.
+     Specifically use phi_g chosen so that C ends up left of A.
+     xC = alpha_c * M / p1
+     We need xC < xA:
+       alpha_c*M/p1 < alpha*M/p0
+       alpha_c < alpha*p1/p0
+       alpha*(p1/p0)^phi_g < alpha*p1/p0
+       (p1/p0)^phi_g < p1/p0
+       phi_g < 1  and  p1 < p0  → this holds for phi_g < 1
+     Wait, (p1/p0)^phi_g < p1/p0 requires phi_g > 1 when p1/p0 < 1.
+     So for Giffen: phi_g > 1.
+
+     Let's verify: p1=2, p0=4 → p1/p0=0.5
+       phi_g=1: alpha_c = alpha*0.5 → xC = alpha*0.5*M/p1 = alpha*M/(2*p1)
+       xA = alpha*M/p0 = alpha*M/4
+       xC = alpha*M/4 = xA  (no Giffen, just breaks even)
+       phi_g=1.5: alpha_c = alpha*0.5^1.5 = alpha*0.354
+       xC = alpha*0.354*M/2 = alpha*0.177*M
+       xA = alpha*M/4 = alpha*0.25*M
+       xC < xA ✓ Giffen!
+
+   For Inferior: phi = 0.4 (mild income effect, IE < 0 but |IE| < SE)
+   For Giffen:   phi = 1.8 (strong income effect, |IE| > SE → TE < 0)
+
+   IC curves: for drawing purposes, we derive the IC through each
+   bundle using the utility function U = x^ae * y^(1-ae) where ae
+   is the alpha used at that bundle.
+   ============================================================ */
+(function(){
+  const root = document.getElementById('pane-ie');
+  const $ = s => root.querySelector('[data-el="'+s+'"]');
+  const svg = $('iePlot'), el = mk(svg);
+
+  const L=50, R=490, T=18, B=340;
+  const AY1=B+38, AY2=B+62, AY3=B+90;
+
+  const PY_PRICE = 4;
+
+  let P0=4, P1=2, M=80, ALPHA=0.5, goodType='normal';
+
+  const INF_PHI  = 0.4;
+  const GIF_PHI  = 1.8;
+
+  function compute(){
+    const p0=P0, p1=P1, m=M, alpha=ALPHA, pY=PY_PRICE;
+
+    if(goodType === 'normal'){
+      const xA = alpha * m / p0;
+      const yA = (1-alpha) * m / pY;
+      const Mc = p1*xA + pY*yA;
+      const xB = alpha * Mc / p1;
+      const yB = (1-alpha) * Mc / pY;
+      const xC = alpha * m / p1;
+      const yC = (1-alpha) * m / pY;
+
+      const uA = Math.pow(xA, alpha) * Math.pow(yA, 1-alpha);
+      const uC = Math.pow(xC, alpha) * Math.pow(yC, 1-alpha);
+
+      const icA = x => {
+        if(x<=0) return Infinity;
+        return Math.pow(uA / Math.pow(x, alpha), 1/(1-alpha));
+      };
+      const icC = x => {
+        if(x<=0) return Infinity;
+        return Math.pow(uC / Math.pow(x, alpha), 1/(1-alpha));
+      };
+
+      return {
+        bA:{x:xA,y:yA}, bB:{x:xB,y:yB}, bC:{x:xC,y:yC},
+        SE:xB-xA, IE:xC-xB, TE:xC-xA,
+        icA, icC, Mc,
+        aeA:alpha, aeB:alpha, aeC:alpha
+      };
+    }
+
+    if(goodType === 'inferior'){
+      const phi = INF_PHI;
+      const aeA = alpha;
+      const xA = aeA * m / p0;
+      const yA = (1-aeA) * m / pY;
+      const Mc = p1*xA + pY*yA;
+      const xB = aeA * Mc / p1;
+      const yB = (1-aeA) * Mc / pY;
+      const ratio = p1/p0;
+      const aeC = alpha * Math.pow(ratio, phi);
+      const xC = aeC * m / p1;
+      const yC = (1-aeC) * m / pY;
+
+      const uA = Math.pow(xA, aeA) * Math.pow(yA, 1-aeA);
+      const uC = Math.pow(xC, aeC) * Math.pow(yC, 1-aeC);
+
+      const icA = x => {
+        if(x<=0) return Infinity;
+        return Math.pow(uA / Math.pow(x, aeA), 1/(1-aeA));
+      };
+      const icC = x => {
+        if(x<=0) return Infinity;
+        return Math.pow(uC / Math.pow(x, aeC), 1/(1-aeC));
+      };
+
+      return {
+        bA:{x:xA,y:yA}, bB:{x:xB,y:yB}, bC:{x:xC,y:yC},
+        SE:xB-xA, IE:xC-xB, TE:xC-xA,
+        icA, icC, Mc,
+        aeA, aeB:aeA, aeC
+      };
+    }
+
+    {
+      const phi = GIF_PHI;
+      const aeA = alpha;
+      const xA = aeA * m / p0;
+      const yA = (1-aeA) * m / pY;
+      const Mc = p1*xA + pY*yA;
+      const xB = aeA * Mc / p1;
+      const yB = (1-aeA) * Mc / pY;
+      const ratio = p1/p0;
+      const aeC = alpha * Math.pow(ratio, phi);
+      const xC = aeC * m / p1;
+      const yC = (1-aeC) * m / pY;
+
+      const uA = Math.pow(xA, aeA) * Math.pow(yA, 1-aeA);
+      const uC = Math.pow(xC, aeC) * Math.pow(yC, 1-aeC);
+
+      const icA = x => {
+        if(x<=0) return Infinity;
+        return Math.pow(uA / Math.pow(x, aeA), 1/(1-aeA));
+      };
+      const icC = x => {
+        if(x<=0) return Infinity;
+        return Math.pow(uC / Math.pow(x, aeC), 1/(1-aeC));
+      };
+
+      return {
+        bA:{x:xA,y:yA}, bB:{x:xB,y:yB}, bC:{x:xC,y:yC},
+        SE:xB-xA, IE:xC-xB, TE:xC-xA,
+        icA, icC, Mc,
+        aeA, aeB:aeA, aeC
+      };
+    }
+  }
+
+  function draw(){
+    svg.innerHTML='';
+
+    const r = compute();
+    const {bA, bB, bC, SE, IE, TE, icA, icC, Mc} = r;
+
+    const allX = [bA.x, bB.x, bC.x, M/P1, M/P0];
+    const allY = [bA.y, bB.y, bC.y, M/PY_PRICE, Mc/PY_PRICE];
+    const rawXmax = Math.max(...allX) * 1.35;
+    const rawYmax = Math.max(...allY) * 1.35;
+    const XMAX = Math.max(rawXmax, 1);
+    const YMAX = Math.max(rawYmax, 1);
+
+    const PX  = x => L + (x/XMAX)*(R-L);
+    const PYc = y => B - (y/YMAX)*(B-T);
+
+    const xTick = niceTick(XMAX/4);
+    for(let x=xTick; x<XMAX; x+=xTick){
+      el('line',{x1:PX(x),y1:T,x2:PX(x),y2:B,stroke:'#F1F5F9','stroke-width':1});
+      svgTxt(el,PX(x),B+13,fmtQ(x),{'text-anchor':'middle','font-size':9,fill:'#CBD5E1'});
+    }
+    const yTick = niceTick(YMAX/4);
+    for(let y=yTick; y<YMAX; y+=yTick){
+      el('line',{x1:L,y1:PYc(y),x2:R,y2:PYc(y),stroke:'#F1F5F9','stroke-width':1});
+      svgTxt(el,L-5,PYc(y)+3.5,fmtQ(y),{'text-anchor':'end','font-size':9,fill:'#CBD5E1'});
+    }
+
+    function drawIC(fn, col, strokeW, dash){
+      let pts=[];
+      for(let i=1; i<=600; i++){
+        const x = XMAX*(i/600);
+        const y = fn(x);
+        if(isFinite(y) && y>=0 && y<=YMAX*1.5)
+          pts.push([PX(x).toFixed(1), PYc(y).toFixed(1)]);
+      }
+      if(pts.length<2) return;
+      const d = pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' ');
+      const at={d,fill:'none',stroke:col,'stroke-width':strokeW,
+                'stroke-linejoin':'round','stroke-linecap':'round'};
+      if(dash) at['stroke-dasharray']=dash;
+      el('path',at);
+    }
+    drawIC(icA, '#94A3B8', 2.2, '');
+    drawIC(icC, '#4F46E5', 2.5, '');
+
+    function clipBL(xiX, yiY){
+      let x0=0, y0=yiY, x1=xiX, y1=0;
+      if(x1>XMAX){ x1=XMAX; y1=yiY*(1-XMAX/xiX); }
+      if(y0>YMAX){ y0=YMAX; x0=xiX*(1-YMAX/yiY); }
+      y1=Math.max(y1,0); x0=Math.max(x0,0);
+      return {x0,y0,x1,y1};
+    }
+
+    const c0 = clipBL(M/P0,   M/PY_PRICE);
+    const c1 = clipBL(M/P1,   M/PY_PRICE);
+    const cc = clipBL(Mc/P1,  Mc/PY_PRICE);
+
+    el('line',{x1:PX(c0.x0),y1:PYc(c0.y0),x2:PX(c0.x1),y2:PYc(c0.y1),
+      stroke:'#94A3B8','stroke-width':2.5,'stroke-dasharray':'7 5','stroke-linecap':'round'});
+
+    el('line',{x1:PX(cc.x0),y1:PYc(cc.y0),x2:PX(cc.x1),y2:PYc(cc.y1),
+      stroke:'#0F766E','stroke-width':2,'stroke-dasharray':'5 3','stroke-linecap':'round'});
+
+    el('line',{x1:PX(c1.x0),y1:PYc(c1.y0),x2:PX(c1.x1),y2:PYc(c1.y1),
+      stroke:'#4F46E5','stroke-width':3,'stroke-linecap':'round'});
+
+    svgTxt(el,PX(c0.x0)-6,PYc(c0.y0),'BL₀',
+      {fill:'#94A3B8','font-size':10,'text-anchor':'end','font-weight':800});
+    svgTxt(el,PX(cc.x0)-6,PYc(cc.y0),'BLc',
+      {fill:'#0F766E','font-size':10,'text-anchor':'end','font-weight':800});
+    {
+      const lx=Math.min(M/P1,XMAX)*0.88;
+      const ly=Math.max((M/PY_PRICE)*(1-lx/(M/P1)),0);
+      svgTxt(el,PX(lx)+4,PYc(ly)-4,'BL₁',
+        {fill:'#4F46E5','font-size':10,'text-anchor':'start','font-weight':800});
+    }
+
+    [[bA,'#94A3B8'],[bB,'#0F766E'],[bC,'#4F46E5']].forEach(([pt,col])=>{
+      if(pt.x>=0&&pt.x<=XMAX&&pt.y>=0&&pt.y<=YMAX){
+        el('line',{x1:PX(pt.x),y1:PYc(pt.y),x2:PX(pt.x),y2:B,
+          stroke:col,'stroke-width':1.2,'stroke-dasharray':'3 3',opacity:0.6});
+      }
+    });
+
+    function dotOk(pt){
+      return pt.x>=0&&pt.x<=XMAX*1.05&&pt.y>=0&&pt.y<=YMAX*1.05;
+    }
+    if(dotOk(bA)) el('circle',{cx:PX(bA.x),cy:PYc(bA.y),r:7,fill:'#94A3B8',stroke:'#fff','stroke-width':2.5});
+    if(dotOk(bB)) el('circle',{cx:PX(bB.x),cy:PYc(bB.y),r:6,fill:'#0F766E',stroke:'#fff','stroke-width':2.5});
+    if(dotOk(bC)) el('circle',{cx:PX(bC.x),cy:PYc(bC.y),r:7,fill:'#4F46E5',stroke:'#fff','stroke-width':2.5});
+
+    function labelPt(pt,lbl,col){
+      if(!dotOk(pt)) return;
+      const cx=PX(pt.x), cy=PYc(pt.y);
+      const ox=cx>R-40?-14:10;
+      const oy=cy<T+20?14:-10;
+      svgTxt(el,cx+ox,cy+oy,lbl,{fill:col,'font-size':12,'font-weight':800});
+    }
+    labelPt(bA,'A','#64748B');
+    labelPt(bB,'B','#0F766E');
+    labelPt(bC,'C','#3730A3');
+
+    el('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+    el('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+    axisArrow(el,R,B,'right');
+    axisArrow(el,L,T,'up');
+    svgTxt(el,R-2,B+22,'Good X',{'text-anchor':'end','font-size':12,fill:'#334155'});
+    svgTxt(el,L-2,T-4,'Good Y',{'text-anchor':'middle','font-size':12,fill:'#334155'});
+
+    const xA_px=PX(bA.x), xB_px=PX(bB.x), xC_px=PX(bC.x);
+
+    svgTxt(el,L-4,AY1+4,'SE',{'text-anchor':'end','font-size':9.5,fill:'#0F766E','font-weight':800});
+    svgTxt(el,L-4,AY2+4,'IE',{'text-anchor':'end','font-size':9.5,fill:'#B45309','font-weight':800});
+    svgTxt(el,L-4,AY3+4,'TE',{'text-anchor':'end','font-size':9.5,fill:'#4F46E5','font-weight':800});
+
+    el('line',{x1:L,y1:AY1-8,x2:L,y2:AY3+12,stroke:'#E5E9F0','stroke-width':1});
+
+    drawArrow(xA_px,xB_px,AY1,'#0F766E');
+    drawArrow(xB_px,xC_px,AY2,'#B45309');
+    drawArrow(xA_px,xC_px,AY3,'#4F46E5');
+
+    [[xA_px,'#94A3B8'],[xB_px,'#0F766E'],[xC_px,'#4F46E5']].forEach(([x,col])=>{
+      el('line',{x1:x,y1:AY1-10,x2:x,y2:AY3+10,
+        stroke:col,'stroke-width':1,'stroke-dasharray':'2 2',opacity:0.45});
+    });
+
+    const seStr=(SE>=0?'+':'')+SE.toFixed(2);
+    const ieStr=(IE>=0?'+':'')+IE.toFixed(2);
+    const teStr=(TE>=0?'+':'')+TE.toFixed(2);
+
+    $('subE').textContent=seStr;
+    $('incE').textContent=ieStr;
+    $('totE').textContent=teStr;
+    $('subE').style.color=SE>=0?'#0F766E':'#B91C1C';
+    $('incE').style.color=IE>=0?'#0F766E':'#B91C1C';
+    $('totE').style.color=TE>=0?'#4F46E5':'#B91C1C';
+
+    $('ieNote').innerHTML=
+      `SE: <b>${seStr}</b> &nbsp;+&nbsp; IE: <b>${ieStr}</b> &nbsp;=&nbsp; TE: <b>${teStr}</b>`;
+
+    const c=$('callout');
+    if(goodType==='normal'){
+      c.innerHTML=
+        `<b>Normal good.</b> Price of X fell from ${P0} to ${P1}. ` +
+        `<b>SE = ${seStr}</b>: X is cheaper relative to Y → substitute toward X (A→B). ` +
+        `<b>IE = ${ieStr}</b>: higher real income → buy more X (B→C). ` +
+        `Both effects reinforce each other. <b>TE = ${teStr}</b>. ` +
+        `Ordering: A &lt; B &lt; C on the x-axis.`;
+    } else if(goodType==='inferior'){
+      c.innerHTML=
+        `<b>Inferior good.</b> Price of X fell from ${P0} to ${P1}. ` +
+        `<b>SE = ${seStr}</b>: relative price effect → substitute toward X (A→B). ` +
+        `<b>IE = ${ieStr}</b>: higher real income → buy <em>less</em> X because X is inferior (B→C). ` +
+        `Effects partially offset. <b>TE = ${teStr}</b>. ` +
+        `Ordering: A &lt; C &lt; B on the x-axis.`;
+    } else {
+      c.innerHTML=
+        `<b>Giffen good.</b> Price of X fell from ${P0} to ${P1}. ` +
+        `<b>SE = ${seStr}</b>: positive substitution effect (A→B). ` +
+        `<b>IE = ${ieStr}</b>: large negative income effect dominates (B→C). ` +
+        `<b>TE = ${teStr}</b> — consumer buys <em>less</em> X when price falls. ` +
+        `Ordering: C &lt; A &lt; B on the x-axis.`;
+    }
+  }
+
+  function drawArrow(x1,x2,y,col){
+    if(Math.abs(x2-x1)<3){
+      el('circle',{cx:(x1+x2)/2,cy:y,r:2.5,fill:col,opacity:0.5});
+      return;
+    }
+    el('line',{x1,y1:y,x2,y2:y,stroke:col,'stroke-width':2.5,'stroke-linecap':'round'});
+    const d=x2>x1?1:-1;
+    el('path',{d:`M${x2} ${y} l${-d*8} -4 l0 8 z`,fill:col});
+  }
+
+  function bind(name,set,fmt){
+    const inp=$(name);
+    inp.addEventListener('input',e=>{
+      set(+e.target.value);
+      $(name+'L').textContent=fmt?fmt(+e.target.value):e.target.value;
+      draw();
+    });
+  }
+  bind('p0',v=>P0=v,v=>v.toFixed(1));
+  bind('p1',v=>P1=v,v=>v.toFixed(1));
+  bind('im',v=>M=v);
+  bind('ia',v=>ALPHA=v,v=>v.toFixed(2));
+
+  root.querySelectorAll('.tog').forEach(b=>{
+    b.addEventListener('click',()=>{
+      root.querySelectorAll('.tog').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      goodType=b.dataset.good;
+      draw();
+    });
+  });
+
+  [
+    ['Reset',        4,   2,   80,  0.50, 'normal'],
+    ['Large drop',   6,   1,   80,  0.50, 'normal'],
+    ['High income',  4,   2,   140, 0.50, 'normal'],
+    ['Inferior good',4,   2,   80,  0.50, 'inferior'],
+    ['Giffen good',  4,   2,   80,  0.50, 'giffen'],
+    ['Strong Giffen',4,   1.5, 80,  0.40, 'giffen']
+  ].forEach(p=>{
+    const b=document.createElement('button');
+    b.className='preset'; b.textContent=p[0];
+    b.onclick=()=>{
+      P0=p[1]; P1=p[2]; M=p[3]; ALPHA=p[4]; goodType=p[5];
+      $('p0').value=P0; $('p1').value=P1;
+      $('im').value=M;  $('ia').value=ALPHA;
+      $('p0L').textContent=P0.toFixed(1);
+      $('p1L').textContent=P1.toFixed(1);
+      $('imL').textContent=M;
+      $('iaL').textContent=ALPHA.toFixed(2);
+      root.querySelectorAll('.tog').forEach(x=>x.classList.remove('on'));
+      root.querySelector(`.tog[data-good="${goodType}"]`).classList.add('on');
+      draw();
+    };
+    $('presets').appendChild(b);
+  });
+
+  draw();
+  root.__draw=draw;
+})();
+
+document.querySelectorAll('#tabs .tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('#tabs .tab').forEach(t=>t.classList.remove('on'));
+    tab.classList.add('on');
+    const key=tab.dataset.tab;
+    document.querySelectorAll('.pane').forEach(p=>
+      p.classList.toggle('on',p.dataset.pane===key));
+    const pane=document.getElementById('pane-'+key);
+    if(pane&&pane.__draw) pane.__draw();
+  });
+});
+</script>
+</body>
+</html>
