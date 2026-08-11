@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 20 · Externalities — Interactive Graph</title>
+<!--
+  Intermediate Microeconomics · Open Interactive Toolkit
+  License: CC BY 4.0 — free to use, share, and adapt with attribution.
+  Self-contained: no external libraries, no tracking.
+  Chapter 20: Externalities — Supply & Demand with Private/Social curves + Policy tools.
+-->
+<style>
+  :root{
+    --acc:#4F46E5; --acc-d:#3730A3; --acc-t:#EEF2FF;
+    --pos:#0F766E; --neg:#B91C1C; --gold:#B45309;
+    --ink:#0F172A; --body:#334155; --slate:#64748B; --mut:#94A3B8;
+    --paper:#F6F7FB; --card:#FFFFFF; --line:#E5E9F0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:22px 18px 40px;}
+  .title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd{border-left:5px solid var(--acc);padding:1px 0 1px 15px;margin:14px 0 4px;}
+  .kicker{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd h1{font-size:21px;line-height:1.2;margin-top:2px;font-weight:800;}
+  .lede{font-size:14px;color:var(--body);margin:9px 0 2px;max-width:730px;}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:14px;}
+  @media(max-width:740px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--card);border-radius:14px;padding:16px 18px;border:1px solid var(--line);}
+  .card h3{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#7A88A0;margin-bottom:10px;font-weight:800;}
+  svg{width:100%;height:auto;display:block;}
+  .ctl{margin:9px 0;}
+  .ctl label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px;}
+  .ctl label b{color:var(--acc);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;-webkit-appearance:none;height:7px;border-radius:7px;background:var(--line);outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:23px;height:23px;border-radius:50%;
+    background:#fff;border:4px solid var(--acc);cursor:pointer;box-shadow:0 2px 7px rgba(15,23,42,.22);}
+  input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid var(--acc);cursor:pointer;}
+  input[type=range]:disabled{opacity:.4;cursor:not-allowed;}
+  input[type=range]:disabled::-webkit-slider-thumb{border-color:var(--mut);cursor:not-allowed;}
+  input[type=range]:disabled::-moz-range-thumb{border-color:var(--mut);cursor:not-allowed;}
+  .stats{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:60px;background:var(--paper);border-radius:10px;padding:9px 4px;text-align:center;}
+  .stat .big{font-size:17px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
+  .stat .lab{font-size:9px;color:var(--slate);text-transform:uppercase;letter-spacing:.02em;margin-top:3px;font-weight:700;}
+  .note{margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--acc-t);font-size:12px;text-align:center;font-weight:700;color:var(--acc-d);font-variant-numeric:tabular-nums;}
+  .callout{margin-top:10px;padding:11px 13px;border-radius:10px;background:var(--paper);font-size:12.5px;color:var(--body);min-height:78px;}
+  .callout b{color:var(--ink);}
+  .preset{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:6px 11px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--ink);transition:.15s;}
+  .preset:hover{border-color:var(--acc);background:var(--acc);color:#fff;}
+  .preset.on{background:var(--acc);color:#fff;border-color:var(--acc);}
+  .preset:disabled,.preset.disabled{opacity:.38;cursor:not-allowed;border-color:var(--line);background:#fff;color:var(--mut);}
+  .preset:disabled:hover,.preset.disabled:hover{background:#fff;color:var(--mut);border-color:var(--line);}
+  .scn-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+  .scn-row .preset{flex:1 1 auto;text-align:center;min-width:120px;}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--slate);margin-top:6px;font-weight:700;transition:opacity .3s;}
+  .legend span{transition:opacity .3s;}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px;transition:background-color .3s;}
+  .legend i.dot{border-radius:50%;}
+  .foot{font-size:11px;color:var(--mut);margin-top:18px;text-align:center;}
+
+  .ctl-title{font-size:12.5px;font-weight:800;margin:14px 0 6px;color:var(--ink);border-top:1px solid var(--line);padding-top:12px;}
+  .chk-group{display:flex;flex-direction:column;gap:6px;}
+  .chk{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:var(--ink);
+       cursor:pointer;padding:6px 8px;border-radius:8px;background:var(--paper);transition:.15s;}
+  .chk:hover{background:var(--acc-t);}
+  .chk input[type=checkbox]{width:16px;height:16px;flex:0 0 16px;accent-color:var(--acc);cursor:pointer;}
+  .chk span{transition:opacity .15s;}
+  .chk input:not(:checked) ~ span{opacity:.55;}
+
+  .policy-card{margin-top:15px;}
+  .policy-hint{font-size:11.5px;color:var(--slate);margin-top:2px;margin-bottom:6px;font-weight:600;}
+  .policy-hint.warn{color:var(--gold);font-weight:800;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">Intermediate Microeconomics · Interactive Toolkit</div>
+
+  <section id="pane-ext">
+    <div class="hd"><div class="kicker">Chapter 20 · Externalities</div><h1>Private vs. Social Optimum</h1></div>
+    <p class="lede">When a transaction affects third parties, the price system misses part of the true cost or benefit. Compare the <b>market</b> outcome to the <b>socially optimal</b> outcome, then test how a <b>policy</b> (tax, subsidy, or quota) can close the gap.</p>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Market with externality</h3>
+        <svg data-el="plot" viewBox="0 0 520 380" role="img" aria-label="Supply and demand with private and social curves, equilibria, deadweight loss, and policy effects"></svg>
+        <div class="legend" data-el="legend">
+          <span data-el="lg-pmc"><i style="background:#0F172A"></i>PMC (Supply)</span>
+          <span data-el="lg-smc"><i style="background:#0F172A"></i>SMC (Social Cost)</span>
+          <span data-el="lg-pmb"><i style="background:#4F46E5"></i>PMB (Demand)</span>
+          <span data-el="lg-smb"><i style="background:#4F46E5"></i>SMB (Social Benefit)</span>
+          <span><i class="dot" style="background:#0F172A"></i>Market Eq.</span>
+          <span><i class="dot" style="background:#4F46E5"></i>Social Optimum</span>
+          <span><i style="background:rgba(185,28,28,0.3)"></i>Deadweight Loss</span>
+          <span data-el="lg-policy" style="display:none"><i style="background:#B45309"></i>Policy Effect</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Scenario</h3>
+        <div class="scn-row">
+          <button class="preset on" data-scn="none">No Externality</button>
+        </div>
+        <div class="scn-row">
+          <button class="preset" data-scn="negProd">Negative Production</button>
+          <button class="preset" data-scn="posProd">Positive Production</button>
+        </div>
+        <div class="scn-row">
+          <button class="preset" data-scn="negCons">Negative Consumption</button>
+          <button class="preset" data-scn="posCons">Positive Consumption</button>
+        </div>
+
+        <div class="ctl" style="margin-top:14px;">
+          <label><span>Externality Magnitude ($/unit)</span><b data-el="eL">20</b></label>
+          <input type="range" data-el="e" min="0" max="40" value="20" step="1">
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="big" data-el="qp" style="color:var(--ink)">–</div><div class="lab">Market Q</div></div>
+          <div class="stat"><div class="big" data-el="qs" style="color:var(--acc)">–</div><div class="lab">Social Q*</div></div>
+          <div class="stat"><div class="big" data-el="dwl" style="color:var(--neg)">–</div><div class="lab">DWL</div></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="big" data-el="pp" style="color:var(--ink)">–</div><div class="lab">Market P</div></div>
+          <div class="stat"><div class="big" data-el="ps" style="color:var(--acc)">–</div><div class="lab">Social P*</div></div>
+        </div>
+
+        <div class="ctl-title">Display Options</div>
+        <div class="chk-group">
+          <label class="chk"><input type="checkbox" data-el="chkMarket" checked><span>Show Market Equilibrium</span></label>
+          <label class="chk"><input type="checkbox" data-el="chkSocial" checked><span>Show Socially Efficient Equilibrium</span></label>
+          <label class="chk"><input type="checkbox" data-el="chkDWL" checked><span>Show Deadweight Loss</span></label>
+        </div>
+
+        <div class="note" data-el="note">–</div>
+        <div class="callout" data-el="callout"></div>
+      </div>
+    </div>
+
+    <div class="card policy-card">
+      <h3>Policy Response</h3>
+      <div class="policy-hint" data-el="polHint">Choose a policy to counteract the externality. Tools that don't mathematically fit the current scenario are disabled.</div>
+      <div class="scn-row">
+        <button class="preset on" data-pol="none">No Policy</button>
+        <button class="preset" data-pol="tax">Pigovian Tax</button>
+      </div>
+      <div class="scn-row">
+        <button class="preset" data-pol="subsidy">Subsidy</button>
+        <button class="preset" data-pol="quota">Quantity Restriction (Quota)</button>
+      </div>
+
+      <div class="ctl" style="margin-top:14px;">
+        <label><span>Policy Strength</span><b data-el="polL">0%</b></label>
+        <input type="range" data-el="pol" min="0" max="100" value="0" step="1" disabled>
+      </div>
+
+      <div class="callout" data-el="polCallout">Select a policy above to see how it changes the market outcome.</div>
+    </div>
+
+    <div class="foot">PMC = 10 + Q, PMB = 100 − Q. An externality shifts the relevant social curve by e per unit. DWL = ½·|Q* − Q<sub>market</sub>|·|SMC − SMB| evaluated at the market quantity. Policies move the market quantity linearly from the unregulated private quantity toward Q* as Policy Strength increases from 0% to 100%.</div>
+  </section>
+
+  <div class="foot" style="margin-top:22px;border-top:1px solid var(--line);padding-top:12px;">
+    Open interactive toolkit for intermediate microeconomics · <b>CC BY 4.0</b> — use, embed, and adapt freely with attribution.
+  </div>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function mk(svg){return (t,at)=>{let e=document.createElementNS(NS,t);for(let k in at)e.setAttribute(k,at[k]);svg.appendChild(e);return e;};}
+
+(function(){
+  const root=document.getElementById('pane-ext');
+  const $=s=>root.querySelector('[data-el="'+s+'"]');
+  const svg=$('plot'), el=mk(svg);
+  const L=54,R=506,T=18,B=330;
+  const QMAX=115, PMAX=150;
+  const PX=q=>L+(q/QMAX)*(R-L);
+  const PY=p=>B-(p/PMAX)*(B-T);
+
+  // ---- economic model ----
+  // PMC(Q) = 10 + Q      PMB(Q) = 100 - Q
+  // SMC(Q) = PMC(Q) + smc   SMB(Q) = PMB(Q) + smb
+  // Private equilibrium (PMC=PMB) is always Q=45, P=55, regardless of externality.
+  const Qpriv=45, Ppriv=55;
+
+  const state={ type:'none', e:20, smcCur:0, smbCur:0, policy:'none', polStrength:0, polCur:0 };
+  let raf=null;
+
+  function isNegType(t){ return t==='negProd' || t==='negCons'; }
+  function isPosType(t){ return t==='posProd' || t==='posCons'; }
+
+  function policyApplicable(p,type){
+    if(p==='none') return true;
+    if(type==='none') return false;
+    if(p==='tax')     return isNegType(type);
+    if(p==='quota')   return isNegType(type);
+    if(p==='subsidy') return isPosType(type);
+    return false;
+  }
+
+  function targets(){
+    let smcT=0, smbT=0;
+    switch(state.type){
+      case 'negProd': smcT= state.e; break;
+      case 'posProd': smcT=-state.e; break;
+      case 'negCons': smbT=-state.e; break;
+      case 'posCons': smbT= state.e; break;
+    }
+    const polOk = policyApplicable(state.policy, state.type);
+    const polT = polOk ? state.polStrength/100 : 0;
+    return {smcT,smbT,polT};
+  }
+
+  function tick(){
+    const {smcT,smbT,polT}=targets();
+    state.smcCur += (smcT-state.smcCur)*0.14;
+    state.smbCur += (smbT-state.smbCur)*0.14;
+    state.polCur += (polT-state.polCur)*0.14;
+    draw();
+    const done = Math.abs(smcT-state.smcCur)<0.03 && Math.abs(smbT-state.smbCur)<0.03 && Math.abs(polT-state.polCur)<0.002;
+    if(!done){
+      raf=requestAnimationFrame(tick);
+    } else {
+      state.smcCur=smcT; state.smbCur=smbT; state.polCur=polT; draw(); raf=null;
+    }
+  }
+  function kick(){ if(!raf) raf=requestAnimationFrame(tick); }
+
+  function txt(x,y,s,o){let e=el('text',Object.assign({x,y,'font-size':11,fill:'#64748B','font-weight':700,'font-family':'Arial'},o||{}));e.textContent=s;return e;}
+
+  // clip a "supply-type" line P = intercept + Q to visible domain
+  function supplyRange(intercept){
+    let q0=Math.max(0, -intercept);
+    let q1=Math.min(QMAX, PMAX-intercept);
+    return q1>q0 ? [q0,q1] : null;
+  }
+  // clip a "demand-type" line P = intercept - Q to visible domain
+  function demandRange(intercept){
+    let q0=Math.max(0, intercept-PMAX);
+    let q1=Math.min(QMAX, intercept);
+    return q1>q0 ? [q0,q1] : null;
+  }
+
+  function line(x1,y1,x2,y2,col,w,dash){
+    let at={x1,y1,x2,y2,stroke:col,'stroke-width':w,'stroke-linecap':'round'};
+    if(dash) at['stroke-dasharray']=dash;
+    el('line',at);
+  }
+
+  function draw(){
+    svg.innerHTML='';
+    const smc=state.smcCur, smb=state.smbCur;
+    const chkMarket = $('chkMarket').checked;
+    const chkSocial = $('chkSocial').checked;
+    const chkDWL   = $('chkDWL').checked;
+
+    const type=state.type;
+    const polOk = policyApplicable(state.policy, type);
+    const activePolicy = polOk ? state.policy : 'none';
+    const frac = state.polCur; // 0..1
+
+    // social optimum
+    let Qsoc=(90+smb-smc)/2;
+    Qsoc=Math.max(1, Math.min(QMAX-1, Qsoc));
+    let Psoc=10+Qsoc+smc;
+
+    // market outcome under policy (blend from Qpriv toward Qsoc)
+    let Qm = Qpriv + frac*(Qsoc-Qpriv);
+    Qm = Math.max(1, Math.min(QMAX-1, Qm));
+
+    let Pm;
+    if(activePolicy==='subsidy' && type==='posCons'){
+      Pm = 10+Qm; // producer-side price defines the trade point here
+    } else {
+      Pm = 100-Qm; // consumer-side price (tax, quota, production subsidy, or no policy)
+    }
+
+    // axes
+    el('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+    el('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+    el('path',{d:`M${R} ${B} l-9 -5 l0 10 z`,fill:'#0F172A'});
+    el('path',{d:`M${L} ${T} l-5 9 l10 0 z`,fill:'#0F172A'});
+    txt(R-4,B+24,'Quantity',{'text-anchor':'end','font-size':13,fill:'#334155'});
+    txt(L-6,T+2,'Price',{'text-anchor':'end','font-size':13,fill:'#334155'});
+
+    // --- deadweight loss triangle (draw first, under curves) ---
+    const gapAtM = (10+Qm+smc) - (100-Qm+smb); // SMC(Qm) - SMB(Qm)
+    const hasDWL = Math.abs(Qsoc-Qm) > 0.4 && Math.abs(gapAtM) > 0.3;
+    let dwlVal=0;
+    if(hasDWL){
+      dwlVal = 0.5*Math.abs(Qsoc-Qm)*Math.abs(gapAtM);
+      if(chkDWL){
+        const ax=Qsoc, ay = 100-Qsoc+smb;   // apex: SMC(Qsoc) == SMB(Qsoc)
+        const bx=Qm, by = 10+Qm+smc;         // SMC at Qm
+        const cx=Qm, cy = 100-Qm+smb;        // SMB at Qm
+        el('polygon',{points:`${PX(ax)},${PY(ay)} ${PX(bx)},${PY(by)} ${PX(cx)},${PY(cy)}`, fill:'#B91C1C', opacity:0.28});
+      }
+    }
+
+    // --- PMC (always) ---
+    let rPMC=supplyRange(10);
+    if(rPMC) line(PX(rPMC[0]),PY(10+rPMC[0]),PX(rPMC[1]),PY(10+rPMC[1]),'#0F172A',3);
+    // --- SMC (only if offset material) ---
+    const smcActive = Math.abs(smc) > 0.5;
+    if(smcActive){
+      let rSMC=supplyRange(10+smc);
+      const col = smc>0 ? '#B91C1C' : '#0F766E';
+      if(rSMC) line(PX(rSMC[0]),PY(10+smc+rSMC[0]),PX(rSMC[1]),PY(10+smc+rSMC[1]),col,3,'9 5');
+    }
+    // --- PMB (always) ---
+    let rPMB=demandRange(100);
+    if(rPMB) line(PX(rPMB[0]),PY(100-rPMB[0]),PX(rPMB[1]),PY(100-rPMB[1]),'#4F46E5',3);
+    // --- SMB (only if offset material) ---
+    const smbActive = Math.abs(smb) > 0.5;
+    if(smbActive){
+      let rSMB=demandRange(100+smb);
+      const col = smb>0 ? '#0F766E' : '#B91C1C';
+      if(rSMB) line(PX(rSMB[0]),PY(100+smb-rSMB[0]),PX(rSMB[1]),PY(100+smb-rSMB[1]),col,3,'3 3');
+    }
+
+    // --- policy line (gold) ---
+    let showPolicyLegend=false;
+    if(activePolicy!=='none' && frac>0.005){
+      showPolicyLegend=true;
+      if(activePolicy==='quota'){
+        // vertical restriction line at Qm
+        el('line',{x1:PX(Qm),y1:B,x2:PX(Qm),y2:PY(100-Qm),stroke:'#B45309','stroke-width':2.6,'stroke-dasharray':'7 5'});
+      } else if(activePolicy==='tax' || (activePolicy==='subsidy' && type==='posProd')){
+        // effective (post-policy) supply-type curve through (Qm, 100-Qm)
+        const intercept = (100-Qm) - Qm; // = 100-2Qm
+        let r=supplyRange(intercept);
+        if(r) line(PX(r[0]),PY(intercept+r[0]),PX(r[1]),PY(intercept+r[1]),'#B45309',2.6,'2 4');
+      } else if(activePolicy==='subsidy' && type==='posCons'){
+        // effective (post-policy) demand-type curve through (Qm, 10+Qm)
+        const intercept = (10+Qm) + Qm; // = 10+2Qm
+        let r=demandRange(intercept);
+        if(r) line(PX(r[0]),PY(intercept-r[0]),PX(r[1]),PY(intercept-r[1]),'#B45309',2.6,'2 4');
+      }
+    }
+
+    // --- equilibrium guides & points ---
+    if(chkMarket){
+      el('line',{x1:PX(Qm),y1:B,x2:PX(Qm),y2:PY(Pm),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      el('line',{x1:PX(Qm),y1:PY(Pm),x2:L,y2:PY(Pm),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      el('circle',{cx:PX(Qm),cy:PY(Pm),r:6,fill:'#0F172A',stroke:'#fff','stroke-width':2.4});
+    }
+
+    if(chkSocial){
+      el('line',{x1:PX(Qsoc),y1:B,x2:PX(Qsoc),y2:PY(Psoc),stroke:'#C7CDF7','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      el('line',{x1:PX(Qsoc),y1:PY(Psoc),x2:L,y2:PY(Psoc),stroke:'#C7CDF7','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      el('circle',{cx:PX(Qsoc),cy:PY(Psoc),r:6,fill:'#4F46E5',stroke:'#fff','stroke-width':2.4});
+    }
+
+    // --- minimal x-axis quantity tick labels (kept for readability) ---
+    if(chkMarket) txt(PX(Qm), B+18, 'Qm', {'text-anchor':'middle','font-size':10.5,fill:'#0F172A','font-weight':800});
+    if(chkSocial && (hasDWL || !chkMarket)) txt(PX(Qsoc), B+18, 'Q*', {'text-anchor':'middle','font-size':10.5,fill:'#3730A3','font-weight':800});
+
+    // --- stats ---
+    $('qp').textContent=Qm.toFixed(1);
+    $('pp').textContent=Pm.toFixed(1);
+    $('qs').textContent=Qsoc.toFixed(1);
+    $('ps').textContent=Psoc.toFixed(1);
+    $('dwl').textContent=dwlVal.toFixed(1);
+
+    // --- legend states ---
+    const lgSmc=$('lg-smc'), lgSmb=$('lg-smb'), lgPolicy=$('lg-policy');
+    lgSmc.style.opacity = smcActive ? 1 : 0.35;
+    lgSmc.querySelector('i').style.background = smc>0?'#B91C1C':(smc<0?'#0F766E':'#0F172A');
+    lgSmc.childNodes[1].textContent = smcActive ? 'SMC (Social Cost)' : 'SMC = PMC (no prod. externality)';
+    lgSmb.style.opacity = smbActive ? 1 : 0.35;
+    lgSmb.querySelector('i').style.background = smb>0?'#0F766E':(smb<0?'#B91C1C':'#4F46E5');
+    lgSmb.childNodes[1].textContent = smbActive ? 'SMB (Social Benefit)' : 'SMB = PMB (no cons. externality)';
+    lgPolicy.style.display = showPolicyLegend ? 'inline' : 'none';
+
+    // --- note ---
+    const noteEl=$('note');
+    if(!hasDWL){
+      noteEl.textContent = (activePolicy!=='none' && frac>0.98)
+        ? 'Efficient — the policy has fully closed the gap. Market quantity equals Q*, no deadweight loss.'
+        : 'Efficient — Market equilibrium equals the Social Optimum. No deadweight loss.';
+    } else {
+      const dir = Qsoc < Qm ? 'over-produced / over-consumed' : 'under-produced / under-consumed';
+      noteEl.textContent = `Market is ${dir} by ${Math.abs(Qm-Qsoc).toFixed(1)} units → DWL ≈ ${dwlVal.toFixed(1)}`;
+    }
+
+    // --- policy callout (dynamic numbers) ---
+    updatePolicyCallout(Qm,Qsoc,dwlVal,frac);
+  }
+
+  function say(){
+    const c=$('callout');
+    const msgs={
+      none:'With <b>no externality</b>, private and social costs and benefits coincide (PMC = SMC, PMB = SMB). The competitive outcome where PMC = PMB is already efficient — total surplus is maximized and there is no deadweight loss.',
+      negProd:'A <b>negative production externality</b> (e.g., pollution from a factory) means producing the good imposes costs on third parties. Social marginal cost (SMC) lies <b>above</b> PMC. The market <b>over-produces</b> relative to the social optimum — trades between Q* and the market quantity cost society more than they are worth, creating deadweight loss.',
+      posProd:'A <b>positive production externality</b> (e.g., R&amp;D spillovers, worker training) means producing the good creates benefits for third parties. Social marginal cost (SMC) lies <b>below</b> PMC. The market <b>under-produces</b> relative to the social optimum, leaving unrealized gains — the shaded triangle.',
+      negCons:'A <b>negative consumption externality</b> (e.g., secondhand smoke) means consuming the good imposes costs on third parties. Social marginal benefit (SMB) lies <b>below</b> PMB. The market <b>over-consumes</b> relative to the social optimum, creating deadweight loss.',
+      posCons:'A <b>positive consumption externality</b> (e.g., vaccination, education) means consuming the good creates benefits for third parties. Social marginal benefit (SMB) lies <b>above</b> PMB. The market <b>under-consumes</b> relative to the social optimum, leaving gains on the table.'
+    };
+    c.innerHTML = msgs[state.type] || msgs.none;
+  }
+
+  // ---- policy explanation text ----
+  const policyWhy = {
+    none: 'No policy is applied. The market sits at its unregulated private equilibrium — any deadweight loss from the externality is left uncorrected.',
+    tax: {
+      negProd:'A <b>Pigovian tax</b> is levied on producers, raising the effective private marginal cost until it approaches the social marginal cost. This fits a <b>negative production externality</b> because it forces producers to internalize the cost they impose on third parties, pulling output down toward the socially efficient quantity.',
+      negCons:'A <b>Pigovian tax</b> raises the effective cost of the good, discouraging the over-consumption caused by a <b>negative consumption externality</b>. Making the price reflect the external cost pulls quantity down toward the socially efficient level.'
+    },
+    subsidy: {
+      posProd:'A <b>subsidy</b> to producers lowers the effective private marginal cost toward the (lower) social marginal cost. This fits a <b>positive production externality</b>: producers are rewarded for spillover benefits, so output rises toward the socially efficient quantity.',
+      posCons:'A <b>subsidy</b> to consumers raises the effective private marginal benefit toward the (higher) social marginal benefit. This fits a <b>positive consumption externality</b>: consumers are rewarded for spillover benefits, so consumption rises toward the socially efficient quantity.'
+    },
+    quota: {
+      negProd:'A <b>quota</b> directly caps output, regardless of price incentives. For a <b>negative production externality</b>, capping quantity at the socially efficient level removes the over-production and its deadweight loss without needing to know the exact tax rate.',
+      negCons:'A <b>quota</b> directly caps the quantity traded, regardless of price incentives. For a <b>negative consumption externality</b>, restricting quantity to the socially efficient level removes the over-consumption and its deadweight loss.'
+    }
+  };
+
+  function updatePolicyCallout(Qm,Qsoc,dwlVal,frac){
+    const c=$('polCallout');
+    const type=state.type, pol=state.policy;
+    const ok = policyApplicable(pol,type);
+    if(pol==='none'){
+      c.innerHTML = policyWhy.none;
+      return;
+    }
+    if(!ok){
+      c.innerHTML = `<b>Not applicable.</b> This policy does not mathematically correct the current externality type. It has been disabled — choose a compatible policy or scenario.`;
+      return;
+    }
+    const why = policyWhy[pol][type] || '';
+    const gapNow = Math.abs(Qm-Qsoc);
+    let outcome;
+    if(gapNow<0.4){
+      outcome = `At ${Math.round(frac*100)}% strength, the market quantity (${Qm.toFixed(1)}) has reached the socially efficient quantity (${Qsoc.toFixed(1)}) — deadweight loss is eliminated.`;
+    } else {
+      outcome = `At ${Math.round(frac*100)}% strength, the market quantity is ${Qm.toFixed(1)} versus a socially efficient quantity of ${Qsoc.toFixed(1)} (DWL ≈ ${dwlVal.toFixed(1)}). Increase the slider to close the remaining gap.`;
+    }
+    c.innerHTML = `${why}<br><br>${outcome}`;
+  }
+
+  // ---- policy availability / UI sync ----
+  function updatePolicyAvailability(){
+    const type=state.type;
+    let anyIssue=false;
+    root.querySelectorAll('[data-pol]').forEach(btn=>{
+      const p=btn.dataset.pol;
+      const ok=policyApplicable(p,type);
+      btn.disabled=!ok;
+      btn.classList.toggle('disabled',!ok);
+    });
+    if(!policyApplicable(state.policy,type)){
+      state.policy='none';
+      state.polStrength=0;
+      root.querySelectorAll('[data-pol]').forEach(b=>b.classList.toggle('on', b.dataset.pol==='none'));
+      $('pol').value=0;
+      $('pol').disabled=true;
+      $('polL').textContent='0%';
+      anyIssue = (type!=='none');
+    }
+    const hint=$('polHint');
+    if(type==='none'){
+      hint.textContent='No externality is present, so no policy is needed — all correction tools are disabled.';
+      hint.classList.add('warn');
+    } else {
+      hint.textContent='Choose a policy to counteract the externality. Tools that don\'t mathematically fit the current scenario are disabled.';
+      hint.classList.remove('warn');
+    }
+  }
+
+  // ---- controls: scenario ----
+  root.querySelectorAll('[data-scn]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      root.querySelectorAll('[data-scn]').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      state.type=btn.dataset.scn;
+      updatePolicyAvailability();
+      say();
+      kick();
+    });
+  });
+
+  $('e').addEventListener('input',e=>{
+    state.e=+e.target.value;
+    $('eL').textContent=state.e;
+    kick();
+  });
+
+  // checkboxes only toggle visibility of graph elements — instant redraw
+  ['chkMarket','chkSocial','chkDWL'].forEach(id=>{
+    $(id).addEventListener('change', draw);
+  });
+
+  // ---- controls: policy ----
+  root.querySelectorAll('[data-pol]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(btn.disabled) return;
+      root.querySelectorAll('[data-pol]').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      state.policy=btn.dataset.pol;
+      const active = state.policy!=='none';
+      $('pol').disabled = !active;
+      if(!active){
+        state.polStrength=0;
+        $('pol').value=0;
+        $('polL').textContent='0%';
+      }
+      kick();
+    });
+  });
+
+  $('pol').addEventListener('input',e=>{
+    state.polStrength=+e.target.value;
+    $('polL').textContent=state.polStrength+'%';
+    kick();
+  });
+
+  updatePolicyAvailability();
+  say();
+  draw();
+})();
+</script>
