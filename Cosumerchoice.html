@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consumer Choice — Interactive Microeconomics</title>
+<!--
+  Intermediate Microeconomics · Open Interactive Toolkit
+  License: CC BY 4.0 — free to use, share, and adapt with attribution.
+  Self-contained: no external libraries, no tracking.
+  Topic: Consumer Choice (Utility Maximization)
+-->
+<style>
+  :root{
+    --acc:#4F46E5; --acc-d:#3730A3; --acc-t:#EEF2FF;
+    --pos:#0F766E; --neg:#B91C1C; --gold:#B45309;
+    --ink:#0F172A; --body:#334155; --slate:#64748B; --mut:#94A3B8;
+    --paper:#F6F7FB; --card:#FFFFFF; --line:#E5E9F0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto;padding:22px 18px 40px;}
+  .title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .pane{display:block;}
+  .hd{border-left:5px solid var(--acc);padding:1px 0 1px 15px;margin:14px 0 4px;}
+  .kicker{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd h1{font-size:21px;line-height:1.2;margin-top:2px;font-weight:800;}
+  .lede{font-size:14px;color:var(--body);margin:9px 0 2px;max-width:730px;}
+  .lede sub{font-size:75%;}
+
+  /* ---- "Try it" callout box ---- */
+  .tryit{
+    margin:16px 0 4px;
+    max-width:800px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:6px solid var(--acc);
+    border-radius:14px;
+    padding:16px 22px;
+    font-size:14px;
+    line-height:1.7;
+    color:var(--body);
+  }
+  .tryit b{color:var(--ink);}
+
+  .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:15px;margin-top:14px;}
+  @media(max-width:740px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--card);border-radius:14px;padding:16px 18px;border:1px solid var(--line);}
+  .card h3{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#7A88A0;margin-bottom:10px;font-weight:800;}
+  svg{width:100%;height:auto;display:block;}
+  .ctl{margin:9px 0;}
+  .ctl label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px;}
+  .ctl label span sub{font-size:75%;}
+  .ctl label b{color:var(--acc);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;-webkit-appearance:none;height:7px;border-radius:7px;background:var(--line);outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:23px;height:23px;border-radius:50%;
+    background:#fff;border:4px solid var(--acc);cursor:pointer;box-shadow:0 2px 7px rgba(15,23,42,.22);}
+  input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid var(--acc);cursor:pointer;}
+  .stats{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:60px;background:var(--paper);border-radius:10px;padding:9px 4px;text-align:center;}
+  .stat .big{font-size:18px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
+  .stat .lab{font-size:9px;color:var(--slate);text-transform:uppercase;letter-spacing:.02em;margin-top:3px;font-weight:700;}
+  .stat .lab sup{font-size:100%;}
+  .note{margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--acc-t);font-size:12px;text-align:center;font-weight:700;color:var(--acc-d);font-variant-numeric:tabular-nums;}
+  .note sub{font-size:75%;}
+  .formula{margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--paper);font-size:12.5px;text-align:center;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .formula sub,.formula sup{font-size:72%;}
+  .callout{margin-top:10px;padding:11px 13px;border-radius:10px;background:var(--paper);font-size:12.5px;color:var(--body);min-height:60px;}
+  .callout b{color:var(--ink);}
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+  .preset{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:6px 11px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--ink);transition:.15s;}
+  .preset:hover{border-color:var(--acc);background:var(--acc);color:#fff;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:11px 22px;margin-top:13px;padding-top:12px;border-top:1px solid var(--line);}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--body);}
+  .legend-item sup{font-size:72%;}
+  .legend-swatch{width:28px;height:0;border-top:3.4px solid #000;border-radius:2px;flex:0 0 auto;}
+  .legend-swatch.dashed{border-top-style:dashed;}
+  .legend-dot{width:14px;height:14px;border-radius:50%;flex:0 0 auto;border:2.5px solid #fff;box-shadow:0 0 0 1.4px rgba(15,23,42,.18);}
+
+  .foot{font-size:11px;color:var(--mut);margin-top:18px;text-align:center;}
+  .foot sub,.foot sup{font-size:80%;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">Intermediate Microeconomics · Interactive Toolkit</div>
+
+  <section class="pane" data-pane="cc" id="pane-cc">
+    <div class="hd"><div class="kicker">Consumer Choice</div><h1>Utility Maximization: the Best Affordable Bundle</h1></div>
+    <p class="lede">A consumer splits a budget between goods X and Y. The optimum sits where the budget line is <b>tangent</b> to the highest reachable indifference curve — where MRS = p<sub>x</sub>/p<sub>y</sub>. Change prices, income, and tastes.</p>
+
+    <div class="tryit">
+      <b>Try it:</b> Move the sliders to change prices, income, or the preference weight — or jump straight into a scenario with the preset buttons (<b>Cheap X</b>, <b>High Income</b>, <b>Prefers Y</b>). Watch the optimum slide along the budget line, and check the tangency box to confirm MRS still equals p<sub>x</sub>/p<sub>y</sub> at the new bundle.
+    </div>
+
+    <div class="grid">
+      <div class="card"><h3>Budget line &amp; indifference curves</h3>
+        <svg data-el="plot" viewBox="0 0 560 380" role="img" aria-label="Indifference curves, budget line, and optimal bundle"></svg>
+        <div class="legend" data-el="legend"></div>
+        <div class="formula" data-el="formula"></div>
+      </div>
+      <div class="card"><h3>Controls</h3>
+        <div class="ctl"><label><span>Price of X (p<sub>x</sub>)</span><b data-el="pxL">4.0</b></label><input type="range" data-el="px" min="2" max="8" value="4" step="0.5" title="Price of good X"></div>
+        <div class="ctl"><label><span>Price of Y (p<sub>y</sub>)</span><b data-el="pyL">4.0</b></label><input type="range" data-el="py" min="2" max="8" value="4" step="0.5" title="Price of good Y"></div>
+        <div class="ctl"><label><span>Income (M)</span><b data-el="mL">80</b></label><input type="range" data-el="m" min="50" max="120" value="80" step="5" title="Consumer income"></div>
+        <div class="ctl"><label><span>Preference for X (a)</span><b data-el="aL">0.50</b></label><input type="range" data-el="a" min="0.2" max="0.8" value="0.5" step="0.05" title="Preference weight on good X"></div>
+        <div class="stats">
+          <div class="stat"><div class="big" data-el="xs" style="color:var(--acc)">–</div><div class="lab">X<sup>*</sup></div></div>
+          <div class="stat"><div class="big" data-el="ys" style="color:var(--acc)">–</div><div class="lab">Y<sup>*</sup></div></div>
+          <div class="stat"><div class="big" data-el="us" style="color:var(--ink)">–</div><div class="lab">Utility</div></div>
+        </div>
+        <div class="note" data-el="tan">MRS = p<sub>x</sub>/p<sub>y</sub></div>
+        <div class="callout" data-el="callout"></div>
+        <div class="presets" data-el="presets"></div>
+      </div>
+    </div>
+  
+
+  <div class="foot" style="margin-top:22px;border-top:1px solid var(--line);padding-top:12px;">
+    Open interactive toolkit for intermediate microeconomics · <b>CC BY 4.0</b> — use, embed, and adapt freely with attribution.
+  </div>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function mk(svg){return (t,at)=>{let e=document.createElementNS(NS,t);for(let k in at)e.setAttribute(k,at[k]);svg.appendChild(e);return e;};}
+
+(function(){
+  const root=document.getElementById('pane-cc'); const $=s=>root.querySelector('[data-el="'+s+'"]');
+  const svg=$('plot'), el=mk(svg);
+
+  // ---- Truly static coordinate system ---------------------------------------
+  // Left margin widened (58 -> 92) to give the horizontal "Good Y" label its
+  // own clear space, without shrinking the plotting area itself (the whole
+  // viewBox grew to compensate, per request to make the graph "bigger").
+  const L=92,R=546,T=26,B=328;
+  const AXIS_MAX = 62;
+
+  const PXp=x=>L+(x/AXIS_MAX)*(R-L);
+  const PYp=y=>B-(y/AXIS_MAX)*(B-T);
+
+  let tgt={px:4,py:4,m:80,a:0.5};
+  let cur={px:4,py:4,m:80,a:0.5};
+  let animId=null;
+
+  function txt(x,y,s,o){let e=el('text',Object.assign({x,y,'font-size':13,fill:'#64748B','font-weight':700,'font-family':'Arial'},o||{}));e.textContent=s;return e;}
+  function rich(x,y,parts,o){
+    let e=el('text',Object.assign({x,y,'font-family':'Arial','font-weight':700,fill:'#0F172A','font-size':12},o||{}));
+    parts.forEach(p=>{
+      let ts=document.createElementNS(NS,'tspan');
+      ts.textContent=p.t;
+      if(p.sub){ts.setAttribute('baseline-shift','-22%');ts.setAttribute('font-size','72%');}
+      if(p.sup){ts.setAttribute('baseline-shift','38%');ts.setAttribute('font-size','72%');}
+      e.appendChild(ts);
+    });
+    return e;
+  }
+  function pathOf(pts,col,w,dash){
+    if(pts.length<2)return;
+    let d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    let at={d,fill:'none',stroke:col,'stroke-width':w,'stroke-linejoin':'round','stroke-linecap':'round'};
+    if(dash)at['stroke-dasharray']=dash;
+    el('path',at);
+  }
+
+  // ---- Indifference curve with an ANALYTIC top-boundary crossing ------------
+  function icurve(u,aa,cap){
+    const ymax=AXIS_MAX;
+    const e=1/(1-aa);
+    let xTop = Math.pow(u/Math.pow(ymax,1-aa), 1/aa);
+    if(!isFinite(xTop)||xTop<0) xTop=0;
+    const xStart=Math.min(Math.max(xTop,0),cap);
+    if(xStart>=cap) return [];
+    let pts=[];
+    const N=170;
+    for(let i=0;i<=N;i++){
+      let x=xStart+(cap-xStart)*(i/N);
+      if(x<=0)continue;
+      let y=Math.pow(u/Math.pow(x,aa),e);
+      if(y>ymax)y=ymax;
+      if(y<0)continue;
+      pts.push([PXp(x),PYp(y)]);
+    }
+    return pts;
+  }
+
+  function draw(s){
+    svg.innerHTML='';
+    const {px,py,m,a}=s;
+
+    // static grid
+    for(let g=10; g<AXIS_MAX; g+=10){
+      el('line',{x1:PXp(g),y1:T,x2:PXp(g),y2:B,stroke:'#EEF1F6','stroke-width':1});
+      el('line',{x1:L,y1:PYp(g),x2:R,y2:PYp(g),stroke:'#EEF1F6','stroke-width':1});
+    }
+
+    // axes
+    el('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+    el('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+    el('path',{d:`M${R} ${B} l-9 -5 l0 10 z`,fill:'#0F172A'});
+    el('path',{d:`M${L} ${T} l-5 9 l10 0 z`,fill:'#0F172A'});
+    txt(R-4,B+24,'Good X',{'text-anchor':'end','font-size':14,fill:'#334155'});
+
+    // "Good Y" — horizontal (no rotation), sitting in the widened left
+    // margin, just above the top of the y-axis. This fixed corner spot
+    // never collides with the data-dependent Y*/M-p_y labels, which live
+    // further down along the axis, and it never runs into the plot area
+    // since it's entirely left of x = L.
+    txt(L-10,T+4,'Good Y',{'text-anchor':'end','font-size':14,fill:'#334155'});
+
+    const xs=a*m/px, ys=(1-a)*m/py, u=Math.pow(xs,a)*Math.pow(ys,1-a);
+    const xi=m/px, yi=m/py;
+
+    pathOf(icurve(u*0.55,a,AXIS_MAX),'#93C5FD',2.2);
+    pathOf(icurve(u*1.65,a,AXIS_MAX),'#3B82F6',2.2,'6 5');
+    pathOf(icurve(u,a,AXIS_MAX),'#4F46E5',3.2);
+
+    // budget line + intercepts
+    el('line',{x1:PXp(0),y1:PYp(yi),x2:PXp(xi),y2:PYp(0),stroke:'#0F172A','stroke-width':3,'stroke-linecap':'round'});
+    el('circle',{cx:PXp(xi),cy:PYp(0),r:3.2,fill:'#0F172A'});
+    el('circle',{cx:PXp(0),cy:PYp(yi),r:3.2,fill:'#0F172A'});
+    rich(PXp(xi),B-10,[{t:'M/p'},{t:'x',sub:true}],{'text-anchor':'middle','font-size':10.5,fill:'#64748B'});
+    rich(L+8,PYp(yi)-7,[{t:'M/p'},{t:'y',sub:true}],{'text-anchor':'start','font-size':10.5,fill:'#64748B'});
+
+    // dashed guide lines to the optimum
+    el('line',{x1:PXp(xs),y1:PYp(ys),x2:PXp(xs),y2:B,stroke:'#CBD5E1','stroke-width':1.4,'stroke-dasharray':'4 4'});
+    el('line',{x1:PXp(xs),y1:PYp(ys),x2:L,y2:PYp(ys),stroke:'#CBD5E1','stroke-width':1.4,'stroke-dasharray':'4 4'});
+
+    // tangency indicator
+    (function(){
+      const dxData=1, dyData=-(px/py);
+      const dxPix=(dxData/AXIS_MAX)*(R-L);
+      const dyPix=-(dyData/AXIS_MAX)*(B-T);
+      const len=Math.hypot(dxPix,dyPix)||1;
+      const half=16/len;
+      const cx=PXp(xs), cy=PYp(ys);
+      el('line',{x1:cx-dxPix*half,y1:cy-dyPix*half,x2:cx+dxPix*half,y2:cy+dyPix*half,
+        stroke:'#7C3AED','stroke-width':2,'stroke-dasharray':'2 3'});
+    })();
+
+    // optimum
+    el('circle',{cx:PXp(xs),cy:PYp(ys),r:6.5,fill:'#7C3AED',stroke:'#fff','stroke-width':2.5});
+    rich(PXp(xs),B+20,[{t:'X'},{t:'*',sup:true}],{'text-anchor':'middle','font-size':12});
+    rich(L-8,PYp(ys)+4,[{t:'Y'},{t:'*',sup:true}],{'text-anchor':'end','font-size':12});
+
+    $('xs').textContent=xs.toFixed(1);
+    $('ys').textContent=ys.toFixed(1);
+    $('us').textContent=u.toFixed(1);
+
+    const mrs=(a/(1-a))*(ys/xs);
+    $('tan').innerHTML=`MRS = ${mrs.toFixed(2)} = p<sub>x</sub>/p<sub>y</sub> = ${(px/py).toFixed(2)} ✓`;
+    $('formula').innerHTML=
+      `x<sup>*</sup> = aM/p<sub>x</sub> = ${xs.toFixed(1)} &nbsp;&nbsp;&nbsp; y<sup>*</sup> = (1−a)M/p<sub>y</sub> = ${ys.toFixed(1)}`;
+  }
+
+  // ---- Legend (below the graph) ---------------------------------------------
+  const LEGEND_ITEMS=[
+    {type:'line',  color:'#0F172A', label:'Budget line'},
+    {type:'line',  color:'#4F46E5', label:'Current indifference curve'},
+    {type:'line',  color:'#93C5FD', label:'Previous / reference indifference curve'},
+    {type:'dashed',color:'#3B82F6', label:'Higher, unattainable indifference curve'},
+    {type:'dot',   color:'#7C3AED', label:'Optimal bundle'},
+    {type:'dashed',color:'#94A3B8', label:'Guide lines to X<sup>*</sup> and Y<sup>*</sup>'}
+  ];
+  function buildLegend(){
+    const box=$('legend'); box.innerHTML='';
+    LEGEND_ITEMS.forEach(it=>{
+      const wrap=document.createElement('div'); wrap.className='legend-item';
+      let sw;
+      if(it.type==='dot'){
+        sw=document.createElement('span'); sw.className='legend-dot'; sw.style.background=it.color;
+      }else{
+        sw=document.createElement('span');
+        sw.className='legend-swatch'+(it.type==='dashed'?' dashed':'');
+        sw.style.borderTopColor=it.color;
+      }
+      const lab=document.createElement('span'); lab.innerHTML=it.label;
+      wrap.appendChild(sw); wrap.appendChild(lab);
+      box.appendChild(wrap);
+    });
+  }
+  buildLegend();
+
+  function explain(param,newVal,oldVal){
+    const up=newVal>oldVal;
+    const msgs={
+      px:up? 'Good X becomes relatively more expensive. The budget line pivots inward along the X-axis, and the optimal quantity of X falls.'
+           : 'Good X becomes relatively cheaper. The budget line pivots outward along the X-axis, and the optimal quantity of X rises.',
+      py:up? 'Good Y becomes relatively more expensive. The budget line pivots inward along the Y-axis, and the optimal quantity of Y falls.'
+           : 'Good Y becomes relatively cheaper. The budget line pivots outward along the Y-axis, and the optimal quantity of Y rises.',
+      m: up? 'Income rises. The budget line shifts outward in parallel (same slope), and since both goods are normal here, both X and Y increase.'
+           : 'Income falls. The budget line shifts inward in parallel, and both X and Y decrease.',
+      a: up? 'The parameter a represents the consumer\u2019s preference for Good X. As a rises, the indifference curves rotate and the optimal bundle shifts toward more X and less Y.'
+           : 'As a falls, preferences tilt toward Good Y — the indifference curves rotate and the optimum shifts toward more Y and less X.'
+    };
+    $('callout').innerHTML=msgs[param];
+  }
+  function initExplain(){
+    $('callout').innerHTML='Drag any slider. The optimum always lands where the budget line just touches the highest indifference curve: MRS = p<sub>x</sub>/p<sub>y</sub>.';
+  }
+
+  // ---- Smooth animation of the DATA only (axis itself never moves) ---------
+  function animate(){
+    let changed=false;
+    for(const k in cur){
+      const d=tgt[k]-cur[k];
+      if(Math.abs(d)>0.0006){ cur[k]+=d*0.16; changed=true; }
+      else cur[k]=tgt[k];
+    }
+    draw(cur);
+    if(changed){ animId=requestAnimationFrame(animate); }
+    else{ animId=null; }
+  }
+  function kick(){ if(!animId) animId=requestAnimationFrame(animate); }
+
+  function bind(name,key,fmt){
+    const inp=$(name);
+    inp.addEventListener('input',e=>{
+      const v=+e.target.value;
+      const old=tgt[key];
+      tgt[key]=v;
+      $(name+'L').textContent=fmt(v);
+      explain(key,v,old);
+      kick();
+    });
+  }
+  bind('px','px',v=>v.toFixed(1));
+  bind('py','py',v=>v.toFixed(1));
+  bind('m','m',v=>String(v));
+  bind('a','a',v=>v.toFixed(2));
+
+  const presets=[['Reset',4,4,80,0.5],['Cheap X',2,6,80,0.5],['High income',3,3,120,0.5],['Prefers Y',4,4,80,0.3]];
+  presets.forEach(p=>{
+    let b=document.createElement('button');b.className='preset';b.textContent=p[0];
+    b.onclick=()=>{
+      tgt.px=p[1]; tgt.py=p[2]; tgt.m=p[3]; tgt.a=p[4];
+      $('px').value=p[1]; $('py').value=p[2]; $('m').value=p[3]; $('a').value=p[4];
+      $('pxL').textContent=p[1].toFixed(1); $('pyL').textContent=p[2].toFixed(1);
+      $('mL').textContent=p[3]; $('aL').textContent=p[4].toFixed(2);
+      initExplain();
+      kick();
+    };
+    $('presets').appendChild(b);
+  });
+
+  draw(cur);
+  initExplain();
+})();
+</script>
+</body>
+</html>
