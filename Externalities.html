@@ -26,6 +26,28 @@
   .kicker{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:800;}
   .hd h1{font-size:21px;line-height:1.2;margin-top:2px;font-weight:800;}
   .lede{font-size:14px;color:var(--body);margin:9px 0 2px;max-width:730px;}
+
+  /* --- Try it / example callouts --- */
+  .tryit{
+    margin:16px 0 0;
+    padding:14px 18px;
+    border-radius:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:5px solid var(--acc);
+    font-size:13.5px;
+    color:var(--body);
+    line-height:1.6;
+  }
+  .tryit b{color:var(--ink);}
+  .tryit.alt{
+    margin-top:10px;
+    background:var(--acc-t);
+    border-left-color:var(--acc-d);
+    color:var(--body);
+  }
+  .tryit.alt b{color:var(--acc-d);}
+
   .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:14px;}
   @media(max-width:740px){.grid{grid-template-columns:1fr;}}
   .card{background:var(--card);border-radius:14px;padding:16px 18px;border:1px solid var(--line);}
@@ -80,8 +102,15 @@
   <div class="title">Intermediate Microeconomics · Interactive Toolkit</div>
 
   <section id="pane-ext">
-    <div class="hd"><div class="kicker">Chapter 20 · Externalities</div><h1>Private vs. Social Optimum</h1></div>
+    <div class="hd"><div class="kicker">Externalities</div><h1>Private vs. Social Optimum</h1></div>
     <p class="lede">When a transaction affects third parties, the price system misses part of the true cost or benefit. Compare the <b>market</b> outcome to the <b>socially optimal</b> outcome, then test how a <b>policy</b> (tax, subsidy, or quota) can close the gap.</p>
+
+    <div class="tryit">
+      <b>Try it:</b> Pick a scenario below — say, <b>Negative Production</b> — and watch the SMC curve rise above PMC, opening up the red deadweight-loss triangle. Then scroll to <b>Policy Response</b>, choose the <b>Pigovian Tax</b>, and drag the strength slider until Market Q lines up with Social Q*. Notice the red triangle shrink to nothing as the policy fully internalizes the externality.
+    </div>
+    <div class="tryit alt">
+      <b>Choose a different scenario:</b> Each externality type calls for a different fix. Try <b>Positive Consumption</b> (e.g., vaccinations or education) — the market <i>under</i>-consumes, so only a <b>Subsidy</b> can pull it up toward Q*. Try <b>Negative Production</b> or <b>Negative Consumption</b> and compare a <b>Tax</b> against a blunt <b>Quota</b> — both can eliminate the deadweight loss, but they work through different mechanisms.
+    </div>
 
     <div class="grid">
       <div class="card">
@@ -159,13 +188,7 @@
 
       <div class="callout" data-el="polCallout">Select a policy above to see how it changes the market outcome.</div>
     </div>
-
-    <div class="foot">PMC = 10 + Q, PMB = 100 − Q. An externality shifts the relevant social curve by e per unit. DWL = ½·|Q* − Q<sub>market</sub>|·|SMC − SMB| evaluated at the market quantity. Policies move the market quantity linearly from the unregulated private quantity toward Q* as Policy Strength increases from 0% to 100%.</div>
   </section>
-
-  <div class="foot" style="margin-top:22px;border-top:1px solid var(--line);padding-top:12px;">
-    Open interactive toolkit for intermediate microeconomics · <b>CC BY 4.0</b> — use, embed, and adapt freely with attribution.
-  </div>
 </div>
 
 <script>
@@ -524,3 +547,5 @@ function mk(svg){return (t,at)=>{let e=document.createElementNS(NS,t);for(let k 
   draw();
 })();
 </script>
+</body>
+</html>
