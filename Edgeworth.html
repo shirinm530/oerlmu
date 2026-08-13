@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edgeworth Box Explorer — Gilligan & Mary Ann</title>
+<style>
+  :root{
+    --bg:#F1F5F9;
+    --card:#FFFFFF;
+    --border:#E2E8F0;
+    --ink:#0F172A;
+    --sub:#64748B;
+    --acc:#4F46E5;
+    --acc-l:#EEF2FF;
+    --pos:#059669;
+    --neg:#DC2626;
+    --gray:#94A3B8;
+    --green:#16A34A;
+    --purple:#7C3AED;
+    --blue:#2563EB;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color:var(--ink);
+  }
+  .page{max-width:1200px;margin:0 auto;padding:0 0 28px;}
+
+  /* --- Header: breadcrumb + accent-bar intro block --- */
+  .breadcrumb{
+    padding:20px 16px 16px;
+    font-size:14px;font-weight:800;color:var(--acc);
+    letter-spacing:.08em;text-transform:uppercase;
+  }
+
+  .intro{display:flex;padding:8px 16px 12px;}
+  .intro-bar{width:4px;background:var(--acc);border-radius:2px;margin-right:14px;flex-shrink:0;}
+  .intro-content .eyebrow{
+    font-size:11px;font-weight:800;color:var(--acc);
+    letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;
+  }
+  .intro-content h1{
+    font-size:22px;font-weight:800;margin:0 0 8px;
+    letter-spacing:-0.01em;color:var(--ink);
+  }
+  .intro-content .desc{
+    font-size:13px;line-height:1.55;color:#334155;max-width:920px;margin:0;
+  }
+
+  /* --- Typography: compact, professional subscript rendering --- */
+  sub{
+    font-size:0.68em;
+    line-height:0;
+    position:relative;
+    bottom:-0.22em;
+    margin-left:0.5px;
+    letter-spacing:normal;
+  }
+  .eq{
+    text-transform:none;
+    letter-spacing:normal;
+    white-space:nowrap;
+    font-weight:inherit;
+  }
+  .eq sub{margin:0 0.5px;}
+
+  /* --- "Try it" callout (guided walkthrough box) --- */
+  .tryit{
+    background:#FFFFFF;
+    border:1px solid var(--border);
+    border-left:5px solid var(--acc);
+    border-radius:10px;
+    padding:12px 16px;
+    margin:0 16px 12px;
+    font-size:13px;
+    line-height:1.55;
+    color:var(--ink);
+    box-shadow:0 1px 2px rgba(15,23,42,0.04),0 1px 8px rgba(15,23,42,0.03);
+  }
+  .tryit b{color:var(--ink);}
+  .tryit .lead{color:var(--acc);}
+
+  .layout{display:grid;grid-template-columns:250px 1fr;gap:14px;padding:0 16px 16px;}
+  @media (max-width:900px){.layout{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04),0 1px 8px rgba(15,23,42,0.03);
+  }
+
+  .card-title{
+    font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--sub);margin:0 0 10px;
+  }
+
+  .slider-row{margin-bottom:12px;}
+  .slider-row label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;gap:8px;
+  }
+  .slider-row label .val{color:var(--acc);font-weight:800;font-size:12px;flex-shrink:0;}
+  input[type=range]{
+    width:100%;height:5px;border-radius:4px;background:#E2E8F0;outline:none;
+    -webkit-appearance:none;appearance:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+    background:var(--acc);border:2.5px solid #fff;box-shadow:0 0 0 1px var(--acc);cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:15px;height:15px;border-radius:50%;background:var(--acc);
+    border:2.5px solid #fff;box-shadow:0 0 0 1px var(--acc);cursor:pointer;
+  }
+  input[type=range]:disabled{opacity:0.4;cursor:not-allowed;}
+  .slider-row.price label .val{color:var(--blue);}
+  .slider-row.price input[type=range]::-webkit-slider-thumb{background:var(--blue);box-shadow:0 0 0 1px var(--blue);}
+  .slider-row.price input[type=range]::-moz-range-thumb{background:var(--blue);box-shadow:0 0 0 1px var(--blue);}
+
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+  .preset{
+    border:1px solid var(--border);background:#F8FAFC;color:var(--ink);
+    font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;cursor:pointer;transition:.15s;
+  }
+  .preset:hover{background:var(--acc-l);border-color:var(--acc);color:var(--acc);}
+
+  .section-gap{margin-top:16px;}
+
+  .toggle-row{display:flex;flex-direction:column;gap:8px;}
+  .toggle{
+    display:flex;align-items:center;gap:8px;padding:8px 12px;
+    border:1px solid var(--border);border-radius:8px;background:#F8FAFC;
+    font-size:12px;font-weight:700;color:var(--ink);cursor:pointer;user-select:none;transition:.15s;
+  }
+  .toggle::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--gray);flex-shrink:0;transition:.15s;}
+  .toggle.on{background:var(--acc-l);border-color:var(--acc);color:var(--acc);}
+  .toggle.on::before{background:var(--acc);}
+
+  .plot-card{display:flex;flex-direction:column;gap:10px;}
+  svg{width:100%;height:auto;display:block;}
+
+  .legend{
+    display:flex;gap:14px;flex-wrap:wrap;row-gap:6px;
+    font-size:11px;font-weight:700;color:var(--sub);
+  }
+  .legend .item{display:flex;align-items:center;gap:5px;white-space:nowrap;}
+  .legend .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
+  .dot.gray{background:var(--gray);}
+  .dot.green{background:var(--green);}
+  .dot.blue{background:var(--blue);}
+  .legend .line{width:14px;height:0;border-top:2.5px solid;display:inline-block;flex-shrink:0;}
+  .line.indigo{border-color:#4F46E5;}
+  .line.tealc{border-color:#0F766E;}
+  .line.purple{border-color:#7C3AED;border-top-style:dashed;}
+  .line.blue{border-color:#2563EB;}
+  .legend .swatch{
+    width:13px;height:9px;border-radius:2px;display:inline-block;
+    background:rgba(22,163,74,0.18);border:1px solid #16A34A;flex-shrink:0;
+  }
+
+  .callout{
+    padding:9px 12px;background:#F8FAFF;border-left:4px solid var(--acc);
+    border-radius:7px;font-size:12px;line-height:1.5;color:var(--ink);
+  }
+
+  .summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:0 16px;}
+  @media (max-width:1000px){.summary-grid{grid-template-columns:repeat(3,1fr);}}
+  @media (max-width:640px){.summary-grid{grid-template-columns:repeat(2,1fr);}}
+  .summary-card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    padding:12px;text-align:center;
+  }
+  .summary-card .label{
+    font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+    color:var(--sub);margin-bottom:5px;
+  }
+  .summary-card .value{font-size:17px;font-weight:800;color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="breadcrumb">INTERMEDIATE MICROECONOMICS &middot; INTERACTIVE TOOLKIT</div>
+
+  <div class="intro">
+    <div class="intro-bar"></div>
+    <div class="intro-content">
+      <div class="eyebrow">GENERAL EQUILIBRIUM</div>
+      <h1>Edgeworth Box Explorer</h1>
+      <p class="desc">
+        Two people, two goods, one fixed pie. Whenever Gilligan's and Mary Ann's marginal rates of
+        substitution differ, a mutually beneficial trade exists. Compare the <b>initial endowment</b>
+        to the <b>Pareto-efficient contract curve</b>, then switch to <b>Competitive Prices</b> to see
+        how a single price ratio can guide both consumers to an efficient allocation on their own.
+      </p>
+    </div>
+  </div>
+
+  <div class="tryit">
+    <span class="lead"><b>Try it:</b></span>
+    Drag <b>Gilligan Initial Bananas</b> down to <b>20</b> and watch the gray <b>Endowment</b> dot slide left — a green‑shaded <b>Lens</b> opens between Gilligan's and Mary Ann's indifference curves, meaning trade is mutually beneficial. Toggle <b>Show Contract Curve</b> to see the purple curve, then click <b>Competitive Prices</b> and drag <b>Relative Price (Pₓ/Pᵥ)</b> until the blue <b>Price Line</b> becomes tangent to both curves at once. Watch the blue <b>Competitive Equilibrium</b> dot snap onto the purple contract curve, <span class="eq">MRS<sub>G</sub></span> and <span class="eq">MRS<sub>M</sub></span> converge to the same value, the lens vanish, and <b>Pareto Efficient?</b> flip to <b>Yes</b>.
+  </div>
+
+  <div class="layout">
+
+    <!-- LEFT: CONTROLS -->
+    <aside class="card controls">
+      <h2 class="card-title">Endowment</h2>
+
+      <div class="slider-row">
+        <label>Gilligan Initial Bananas <span class="val" data-el="gbL">50</span></label>
+        <input type="range" min="1" max="99" value="50" data-el="gb">
+      </div>
+
+      <div class="slider-row">
+        <label>Gilligan Initial Coconuts <span class="val" data-el="gcL">50</span></label>
+        <input type="range" min="1" max="99" value="50" data-el="gc">
+      </div>
+
+      <div class="presets" data-el="presets">
+        <button class="preset" data-el="resetBtn">Reset</button>
+      </div>
+
+      <h2 class="card-title section-gap">Preferences (Cobb-Douglas <span class="eq">α</span>)</h2>
+
+      <div class="slider-row">
+  <label>Gilligan Preference <span class="eq">(α<sub>G</sub>)</span> <span class="val" data-el="agL">0.50</span></label>
+  <input type="range" min="0.05" max="0.95" step="0.01" value="0.5" data-el="ag">
+</div>
+
+<div class="slider-row">
+  <label>Mary Ann Preference <span class="eq">(α<sub>M</sub>)</span> <span class="val" data-el="amL">0.50</span></label>
+  <input type="range" min="0.05" max="0.95" step="0.01" value="0.5" data-el="am">
+</div>
+
+      <h2 class="card-title section-gap">Market Mechanism</h2>
+      <div class="toggle-row">
+        <div class="toggle on" data-el="barter">Barter Economy</div>
+        <div class="toggle" data-el="prices">Competitive Prices</div>
+      </div>
+
+      <div class="slider-row price section-gap">
+        <label>Relative Price <span class="eq">(P<sub>x</sub>/P<sub>y</sub>)</span> <span class="val" data-el="priceL">1.00</span></label>
+        <input type="range" min="0.1" max="5" step="0.01" value="1" data-el="price" disabled>
+      </div>
+
+      <h2 class="card-title section-gap">Display</h2>
+      <div class="toggle-row">
+        <div class="toggle" data-el="curve">Show Contract Curve</div>
+        <div class="toggle" data-el="lens">Show Lens</div>
+      </div>
+    </aside>
+
+    <!-- RIGHT: PLOT -->
+    <main class="card plot-card">
+      <svg data-el="plot" viewBox="0 0 640 400" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <div class="legend">
+        <span class="item"><span class="dot gray"></span> Initial Endowment</span>
+        <span class="item"><span class="dot green"></span> Efficient Allocation</span>
+        <span class="item"><span class="dot blue"></span> Competitive Equilibrium</span>
+        <span class="item"><span class="line indigo"></span> Gilligan's Indifference Curve</span>
+        <span class="item"><span class="line tealc"></span> Mary Ann's Indifference Curve</span>
+        <span class="item"><span class="line purple"></span> Contract Curve</span>
+        <span class="item"><span class="line blue"></span> Price Line</span>
+        <span class="item"><span class="swatch"></span> Mutually Beneficial Trade (Lens)</span>
+      </div>
+
+      <div class="callout" data-el="callout">Loading…</div>
+    </main>
+
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="label">Gains from Trade?</div>
+      <div class="value" data-el="tradeVal">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="label"><span class="eq">MRS<sub>G</sub></span> (Gilligan)</div>
+      <div class="value" data-el="mrsGVal">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="label"><span class="eq">MRS<sub>M</sub></span> (Mary Ann)</div>
+      <div class="value" data-el="mrsMVal">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Pareto Efficient?</div>
+      <div class="value" data-el="paretoVal">—</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Price Ratio (<span class="eq">P<sub>x</sub>/P<sub>y</sub></span>)</div>
+      <div class="value" data-el="priceRatioVal">—</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.querySelector('[data-el="plot"]');
+  function el(tag,attrs){
+    const e=document.createElementNS(NS,tag);
+    for(const k in attrs) e.setAttribute(k,attrs[k]);
+    svg.appendChild(e);
+    return e;
+  }
+  function txt(x,y,s,o){
+    const e=el('text',Object.assign({x,y,'font-size':12,'font-family':'Arial','font-weight':700,fill:'#64748B'},o||{}));
+    e.textContent=s;
+    return e;
+  }
+
+  // Box coordinates (scaled down to match the smaller viewBox)
+  const L=100,R=540,T=50,B=320;
+  // Total endowments (fixed economy size)
+  const TX=100, TY=100;
+
+  function drawBase(){
+    el('rect',{x:L,y:T,width:R-L,height:B-T,fill:'#FFFFFF',stroke:'#0F172A','stroke-width':2});
+    txt(L+6,B+24,'Gilligan (origin)',{fill:'#4F46E5','font-size':12,'font-weight':800});
+    txt(R-6,T-12,'Mary Ann (origin)',{fill:'#0F766E','font-size':12,'font-weight':800,'text-anchor':'end'});
+    txt((L+R)/2,B+48,'Bananas →',{fill:'#334155','font-size':13,'text-anchor':'middle'});
+    const cy=(T+B)/2;
+    const t=txt(0,0,'Coconuts →',{fill:'#334155','font-size':13,'text-anchor':'middle'});
+    t.setAttribute('transform',`translate(${L-42},${cy}) rotate(-90)`);
+  }
+  drawBase();
+
+  // Groups (z-order: lens fill -> contract curve -> price line -> indifference curves -> dots)
+  const lensGroup=el('g',{});
+  const contractGroup=el('g',{});
+  const priceLineGroup=el('g',{});
+  const curveGGroup=el('g',{});
+  const curveMGroup=el('g',{});
+
+  // Initial Endowment (gray, movable via sliders) — no attached label
+  const endow=el('circle',{cx:0,cy:0,r:7,fill:'#94A3B8',stroke:'#fff','stroke-width':2.5});
+
+  // Efficient Allocation (green) — NOT a fixed/visual position. Its
+  // coordinates are recomputed every frame directly from the SAME
+  // closed-form contract-curve equation used to draw the purple Contract
+  // Curve (see `contractCurvePoints` / `efficientPointAtX` below), so by
+  // construction MRS_G = MRS_M and the dot always lies exactly on the
+  // purple curve. If that equation ever degenerates (non-finite result),
+  // the dot is hidden rather than shown in an economically wrong spot.
+  const greenDot=el('circle',{cx:0,cy:0,r:7,fill:'#16A34A',stroke:'#fff','stroke-width':2.5,opacity:0});
+
+  // Competitive Equilibrium (blue, only shown in Competitive Prices mode) — no attached label
+  const eqDot=el('circle',{cx:0,cy:0,r:7,fill:'#2563EB',stroke:'#fff','stroke-width':2.5,opacity:0});
+
+  // --- Control refs ---
+  const gb=document.querySelector('[data-el="gb"]');
+  const gc=document.querySelector('[data-el="gc"]');
+  const gbL=document.querySelector('[data-el="gbL"]');
+  const gcL=document.querySelector('[data-el="gcL"]');
+  const ag=document.querySelector('[data-el="ag"]');
+  const agL=document.querySelector('[data-el="agL"]');
+  const am=document.querySelector('[data-el="am"]');
+  const amL=document.querySelector('[data-el="amL"]');
+  const priceSlider=document.querySelector('[data-el="price"]');
+  const priceL=document.querySelector('[data-el="priceL"]');
+  const tradeVal=document.querySelector('[data-el="tradeVal"]');
+  const mrsGVal=document.querySelector('[data-el="mrsGVal"]');
+  const mrsMVal=document.querySelector('[data-el="mrsMVal"]');
+  const paretoVal=document.querySelector('[data-el="paretoVal"]');
+  const priceRatioVal=document.querySelector('[data-el="priceRatioVal"]');
+  const callout=document.querySelector('[data-el="callout"]');
+  const curveToggle=document.querySelector('[data-el="curve"]');
+  const lensToggle=document.querySelector('[data-el="lens"]');
+  const barter=document.querySelector('[data-el="barter"]');
+  const prices=document.querySelector('[data-el="prices"]');
+
+  function placeEndowment(xG,yG){
+    const x=L+(R-L)*(xG/TX);
+    const y=B-(B-T)*(yG/TY);
+    endow.setAttribute('cx',x);
+    endow.setAttribute('cy',y);
+  }
+
+  // pixel mapping (Gilligan/box coordinate frame: origin bottom-left)
+  function toPx(x,y){
+    return [ L+(x/TX)*(R-L), B-(y/TY)*(B-T) ];
+  }
+  // Mary Ann's own coordinate frame: origin top-right
+  function toPxM(xM,yM){
+    return [ R-(xM/TX)*(R-L), T+(yM/TY)*(B-T) ];
+  }
+
+  // --- Curve rendering helpers ---
+  function renderPath(group,pts,attrs){
+    while(group.firstChild) group.removeChild(group.firstChild);
+    if(pts.length<2) return;
+    let d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ');
+    const path=document.createElementNS(NS,'path');
+    path.setAttribute('d',d);
+    for(const k in attrs) path.setAttribute(k,attrs[k]);
+    group.appendChild(path);
+  }
+
+  // Indifference curve points for a consumer, in THEIR OWN coordinate frame.
+  function curvePoints(origin,x0,y0,alpha){
+    const U=Math.pow(x0,alpha)*Math.pow(y0,1-alpha);
+    const steps=160;
+    const xMin=TX*0.01, xMax=TX*0.995;
+    let pts=[];
+    for(let i=0;i<=steps;i++){
+      let x=xMin+(xMax-xMin)*(i/steps);
+      let y=Math.pow(U/Math.pow(x,alpha),1/(1-alpha));
+      if(!isFinite(y)||y<0||y>TY) continue;
+      let p = origin==='G' ? toPx(x,y) : toPxM(x,y);
+      pts.push(p);
+    }
+    return pts;
+  }
+
+  // --- Analytical Cobb-Douglas contract curve ---
+  // For Cobb-Douglas utilities U_G = x^aG * y^(1-aG) and U_M similarly,
+  // tangency (MRS_G = MRS_M) along the box reduces to a single closed-form
+  // curve y(x). Both the purple Contract Curve AND the green Efficient
+  // Allocation dot are generated from this exact formula, so they are
+  // guaranteed to be consistent with each other.
+  function contractCurveY(x,aG,aM){
+    const A=aG/(1-aG), Bc=aM/(1-aM);
+    const xs=Math.max(0.0001,Math.min(TX-0.0001,x));
+    const denom=A*TX + xs*(Bc-A);
+    if(!isFinite(denom) || Math.abs(denom)<1e-9) return null;
+    let y=Bc*TY*xs/denom;
+    if(!isFinite(y)) return null;
+    y=Math.max(0,Math.min(TY,y));
+    return y;
+  }
+
+  function contractCurvePoints(aG,aM){
+    const steps=140;
+    let pts=[];
+    for(let i=0;i<=steps;i++){
+      let x=TX*i/steps;
+      const y=contractCurveY(x,aG,aM);
+      if(y==null) continue;
+      pts.push(toPx(Math.max(0.0001,Math.min(TX-0.0001,x)),y));
+    }
+    return pts;
+  }
+
+  // The Efficient Allocation (green dot): a specific point ON the contract
+  // curve, chosen at Gilligan's CURRENT banana holding (xGc). This makes it
+  // a concrete, meaningful Pareto-efficient allocation that "sits above"
+  // the endowment in the box (same bananas, coconuts reallocated to reach
+  // tangency) — and it is derived from the identical equation as the
+  // purple curve, so MRS_G = MRS_M holds exactly. Returns null if the
+  // equation degenerates, in which case the dot is hidden.
+  function efficientPointAtX(x,aG,aM){
+    const y=contractCurveY(x,aG,aM);
+    if(y==null) return null;
+    const xs=Math.max(0.0001,Math.min(TX-0.0001,x));
+    return {x:xs,y:y};
+  }
+
+  // Box-frame (Gilligan coordinates) evaluators for the lens boundary curves
+  function yG_of_x(x,U,a){ return Math.pow(U/Math.pow(x,a),1/(1-a)); }
+  function yMbox_of_x(x,U,a){ return TY - Math.pow(U/Math.pow(TX-x,a),1/(1-a)); }
+
+  // Find the second point (besides the endowment) where Gilligan's and Mary
+  // Ann's indifference curves through the endowment intersect. Together with
+  // the endowment itself, this defines the exact lens boundary.
+  function findOtherIntersection(x0,U_G,aG,U_M,aM){
+    function f(x){
+      const yg=yG_of_x(x,U_G,aG);
+      const ym=yMbox_of_x(x,U_M,aM);
+      if(!isFinite(yg)||!isFinite(ym)) return null;
+      return ym-yg;
+    }
+    const steps=800;
+    const xs0=0.05, xs1=TX-0.05;
+    let prevX=xs0, prevF=f(prevX);
+    let found=null;
+    for(let i=1;i<=steps;i++){
+      let x=xs0+(xs1-xs0)*i/steps;
+      let fx=f(x);
+      if(prevF!=null && fx!=null){
+        if((prevF<0&&fx>0)||(prevF>0&&fx<0)){
+          const mid=(prevX+x)/2;
+          if(Math.abs(mid-x0)>0.6){
+            let lo=prevX,hi=x,flo=prevF;
+            for(let k=0;k<60;k++){
+              let m=(lo+hi)/2, fm=f(m);
+              if((flo<0&&fm>0)||(flo>0&&fm<0)){hi=m;} else {lo=m;flo=fm;}
+            }
+            found=(lo+hi)/2;
+          }
+        }
+      }
+      prevX=x; prevF=fx;
+    }
+    return found;
+  }
+
+  // Build the TRUE lens: the exact intersection of {better for Gilligan}
+  // and {better for Mary Ann}, using the exact Cobb-Douglas indifference
+  // curves through the endowment as both boundaries.
+  function buildLens(xLeft,xRight,U_G,aG,U_M,aM){
+    const steps=90;
+    let top=[], bottom=[];
+    for(let i=0;i<=steps;i++){
+      let x=xLeft+(xRight-xLeft)*i/steps;
+      let xs=Math.max(0.05,Math.min(TX-0.05,x));
+      let yTop=yMbox_of_x(xs,U_M,aM);
+      let yBot=yG_of_x(xs,U_G,aG);
+      if(!isFinite(yTop)||!isFinite(yBot)) continue;
+      yTop=Math.max(0,Math.min(TY,yTop));
+      yBot=Math.max(0,Math.min(TY,yBot));
+      top.push(toPx(xs,yTop));
+      bottom.push(toPx(xs,yBot));
+    }
+    return top.concat(bottom.reverse());
+  }
+
+  function renderPolygon(group,pts,attrs){
+    while(group.firstChild) group.removeChild(group.firstChild);
+    if(pts.length<3) return;
+    let d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' ')+' Z';
+    const path=document.createElementNS(NS,'path');
+    path.setAttribute('d',d);
+    for(const k in attrs) path.setAttribute(k,attrs[k]);
+    group.appendChild(path);
+  }
+
+  // ============================================================
+  // COMPETITIVE EQUILIBRIUM (closed-form, Cobb-Douglas)
+  // ============================================================
+  // NOTE ON CORRECTNESS: for Cobb-Douglas preferences, the Walrasian
+  // equilibrium demand is x* = aG*W/p, y* = (1-aG)*W. By construction,
+  // MRS_G at (x*,y*) = (aG/(1-aG))*(y*/x*) = p, and symmetrically
+  // MRS_M = p for Mary Ann's allocation. Hence MRS_G = MRS_M = p always
+  // holds at equilibrium, which is exactly the tangency condition that
+  // defines the contract curve — so the blue Competitive Equilibrium dot
+  // is guaranteed (by the First Welfare Theorem) to lie ON the same
+  // contract curve as the green dot and the purple curve. This is
+  // independent of how the green dot is computed.
+  function computeEquilibrium(xG0,yG0,aG,aM){
+    const N = aG*yG0 + aM*(TY-yG0);
+    const D = TX - aG*xG0 - aM*(TX-xG0);
+    if(Math.abs(D)<1e-9) return null;
+    const p = N/D;
+    if(!isFinite(p) || p<=0) return null;
+    const W_G = p*xG0 + yG0;
+    const xEq = aG*W_G/p;
+    const yEq = (1-aG)*W_G;
+    if(!isFinite(xEq)||!isFinite(yEq)) return null;
+    return { p, xEq, yEq };
+  }
+
+  // Find where a line through (x0,y0) with dy/dx = slope crosses the box boundary
+  function priceLineEndpoints(x0,y0,slope){
+    let candidates=[];
+    const yAt0 = y0 + slope*(0-x0);
+    if(yAt0>=-1e-6 && yAt0<=TY+1e-6) candidates.push([0, Math.max(0,Math.min(TY,yAt0))]);
+    const yAtTX = y0 + slope*(TX-x0);
+    if(yAtTX>=-1e-6 && yAtTX<=TY+1e-6) candidates.push([TX, Math.max(0,Math.min(TY,yAtTX))]);
+    if(Math.abs(slope)>1e-9){
+      const xAt0 = x0 + (0-y0)/slope;
+      if(xAt0>=-1e-6 && xAt0<=TX+1e-6) candidates.push([Math.max(0,Math.min(TX,xAt0)),0]);
+      const xAtTY = x0 + (TY-y0)/slope;
+      if(xAtTY>=-1e-6 && xAtTY<=TX+1e-6) candidates.push([Math.max(0,Math.min(TX,xAtTY)),TY]);
+    }
+    let uniq=[];
+    for(const c of candidates){
+      if(!uniq.some(u=>Math.abs(u[0]-c[0])<1e-4 && Math.abs(u[1]-c[1])<1e-4)) uniq.push(c);
+    }
+    if(uniq.length<2) return null;
+    uniq.sort((a,b)=>a[0]-b[0]);
+    return [uniq[0], uniq[uniq.length-1]];
+  }
+
+  // --- Main compute + draw ---
+  function compute(){
+    let xG=+gb.value, yG=+gc.value;
+    let xM=TX-xG, yM=TY-yG;
+    let aG=+ag.value, aM=+am.value;
+    const pricesMode = prices.classList.contains('on');
+
+    placeEndowment(xG,yG);
+
+    const xGc=Math.max(0.3,Math.min(TX-0.3,xG));
+    const yGc=Math.max(0.3,Math.min(TY-0.3,yG));
+    const xMc=Math.max(0.3,Math.min(TX-0.3,xM));
+    const yMc=Math.max(0.3,Math.min(TY-0.3,yM));
+    const aGc=Math.max(0.02,Math.min(0.98,aG));
+    const aMc=Math.max(0.02,Math.min(0.98,aM));
+
+    renderPath(curveGGroup, curvePoints('G',xGc,yGc,aGc), {fill:'none',stroke:'#4F46E5','stroke-width':2.5,'stroke-linecap':'round'});
+    renderPath(curveMGroup, curvePoints('M',xMc,yMc,aMc), {fill:'none',stroke:'#0F766E','stroke-width':2.5,'stroke-linecap':'round'});
+
+    // MRS at the initial endowment — always used to determine whether the
+    // STARTING POINT is Pareto efficient. This drives "Gains from Trade?"
+    // (mode-independent), and also "Pareto Efficient?" in Barter mode,
+    // since barter never moves the allocation off the endowment on its own.
+    const mrsG_endow=(aGc/(1-aGc))*(yGc/xGc);
+    const mrsM_endow=(aMc/(1-aMc))*(yMc/xMc);
+    const tol=0.03;
+    const efficientEndow = Math.abs(mrsG_endow-mrsM_endow) < tol;
+
+    // Contract curve (always reflects current preferences; mode-independent)
+    const ccPts=contractCurvePoints(aGc,aMc);
+    renderPath(contractGroup,ccPts,{
+      fill:'none', stroke:'#7C3AED', 'stroke-width':2.5,
+      'stroke-dasharray':'7 5', 'stroke-linecap':'round'
+    });
+    contractGroup.setAttribute('opacity', curveToggle.classList.contains('on') ? 1 : 0);
+
+    // --- Efficient Allocation (green dot) ---
+    // Computed from the SAME equation as the purple Contract Curve above
+    // (contractCurveY), evaluated at Gilligan's current banana holding.
+    // This guarantees MRS_G = MRS_M at the plotted point, so it always
+    // lies exactly on the purple curve and updates correctly as the
+    // endowment/preference sliders move. If the equation is degenerate,
+    // the dot is hidden rather than drawn in the wrong place.
+    const greenPt = efficientPointAtX(xGc,aGc,aMc);
+    if(greenPt){
+      const [gx,gy]=toPx(greenPt.x,greenPt.y);
+      greenDot.setAttribute('cx',gx);
+      greenDot.setAttribute('cy',gy);
+      greenDot.setAttribute('opacity',1);
+    } else {
+      greenDot.setAttribute('opacity',0);
+    }
+
+    // Lens — exact intersection of both consumers' preferred sets relative
+    // to the endowment (mode-independent: always shows the trade
+    // opportunity available starting from the initial endowment).
+    if(efficientEndow){
+      renderPolygon(lensGroup,[],{});
+      lensGroup.setAttribute('opacity',0);
+    } else {
+      const U_G0=Math.pow(xGc,aGc)*Math.pow(yGc,1-aGc);
+      const U_M0=Math.pow(xMc,aMc)*Math.pow(yMc,1-aMc);
+      const otherX=findOtherIntersection(xGc,U_G0,aGc,U_M0,aMc);
+      if(otherX!=null){
+        const xLeft=Math.min(xGc,otherX);
+        const xRight=Math.max(xGc,otherX);
+        const lensPts=buildLens(xLeft,xRight,U_G0,aGc,U_M0,aMc);
+        renderPolygon(lensGroup,lensPts,{
+          fill:'rgba(22,163,74,0.18)', stroke:'#16A34A', 'stroke-width':1.5
+        });
+        lensGroup.setAttribute('opacity', lensToggle.classList.contains('on') ? 1 : 0);
+      } else {
+        renderPolygon(lensGroup,[],{});
+        lensGroup.setAttribute('opacity',0);
+      }
+    }
+
+    // ---------------- Competitive Prices mode ----------------
+    priceSlider.disabled = !pricesMode;
+    let eq=null;
+    if(pricesMode){
+      eq = computeEquilibrium(xGc,yGc,aGc,aMc);
+    }
+
+    // MRS values shown in the summary cards describe whichever allocation
+    // is "current" for the active mode: the endowment in Barter mode, or
+    // the market-cleared equilibrium in Competitive Prices mode.
+    let mrsG_display, mrsM_display;
+    if(pricesMode && eq){
+      const xMeq = TX-eq.xEq, yMeq = TY-eq.yEq;
+      mrsG_display = (aGc/(1-aGc))*(eq.yEq/eq.xEq);
+      mrsM_display = (aMc/(1-aMc))*(yMeq/xMeq);
+    } else {
+      mrsG_display = mrsG_endow;
+      mrsM_display = mrsM_endow;
+    }
+
+    // --- Gains from Trade? ---
+    // Answers: "Starting from the initial endowment, are there any
+    // mutually beneficial trades available?" Always evaluated at the
+    // INITIAL ENDOWMENT, independent of the selected mode (Barter or
+    // Competitive Prices). Computed independently from "Pareto Efficient?".
+    tradeVal.textContent = efficientEndow ? 'No' : 'Yes';
+    tradeVal.style.color = efficientEndow ? 'var(--sub)' : 'var(--pos)';
+
+    // --- Pareto Efficient? ---
+    // Competitive Prices mode: the equilibrium always satisfies
+    // MRS_G = MRS_M = Px/Py, so it always lies on the contract curve
+    // (First Welfare Theorem) — always "Yes".
+    // Barter mode: reflects the current allocation (= the endowment).
+    if(pricesMode && eq){
+      paretoVal.textContent = 'Yes';
+      paretoVal.style.color = 'var(--pos)';
+    } else {
+      paretoVal.textContent = efficientEndow ? 'Yes' : 'No';
+      paretoVal.style.color = efficientEndow ? 'var(--pos)' : 'var(--neg)';
+    }
+
+    mrsGVal.textContent = mrsG_display.toFixed(2);
+    mrsMVal.textContent = mrsM_display.toFixed(2);
+
+    if(pricesMode && eq){
+      priceRatioVal.textContent = eq.p.toFixed(2);
+      priceRatioVal.style.color='var(--blue)';
+
+      // Draw price line through the ACTUAL initial endowment using the
+      // slider's chosen price (defaults to the market-clearing price).
+      const pLine = +priceSlider.value;
+      const seg = priceLineEndpoints(xG,yG,-pLine);
+      if(seg){
+        const p1=toPx(seg[0][0],seg[0][1]);
+        const p2=toPx(seg[1][0],seg[1][1]);
+        renderPath(priceLineGroup,[p1,p2],{stroke:'#2563EB','stroke-width':2.5,'stroke-linecap':'round'});
+        priceLineGroup.setAttribute('opacity',1);
+      } else {
+        renderPath(priceLineGroup,[],{});
+        priceLineGroup.setAttribute('opacity',0);
+      }
+
+      // Plot equilibrium point
+      const [ex,ey]=toPx(eq.xEq,eq.yEq);
+      eqDot.setAttribute('cx',ex);
+      eqDot.setAttribute('cy',ey);
+      eqDot.setAttribute('opacity',1);
+
+    } else {
+      priceRatioVal.textContent='—';
+      priceRatioVal.style.color='var(--ink)';
+      renderPath(priceLineGroup,[],{});
+      priceLineGroup.setAttribute('opacity',0);
+      eqDot.setAttribute('opacity',0);
+    }
+
+    updateCallout(mrsG_endow,mrsM_endow,efficientEndow,pricesMode,eq);
+  }
+
+  function updateCallout(mrsG,mrsM,efficient,pricesMode,eq){
+    if(pricesMode && eq){
+      callout.innerHTML=`At the competitive equilibrium price ratio <b><span class="eq">P<sub>x</sub>/P<sub>y</sub> = ${eq.p.toFixed(2)}</span></b>, both Gilligan and Mary Ann face the same budget line through the initial endowment and independently choose utility-maximizing bundles. Markets clear exactly at the <b>blue equilibrium point</b>, where <b><span class="eq">MRS<sub>G</sub> = MRS<sub>M</sub> = P<sub>x</sub>/P<sub>y</sub> = ${eq.p.toFixed(2)}</span></b>. This point lies exactly on the purple contract curve, confirming the competitive equilibrium is Pareto efficient.`;
+    } else if(efficient){
+      callout.innerHTML=`At this endowment, <b><span class="eq">MRS<sub>G</sub> ≈ MRS<sub>M</sub> ≈ ${mrsG.toFixed(2)}</span></b>. The two indifference curves are tangent — this point lies <b>on the contract curve</b>. No further voluntary trade can make one person better off without hurting the other.`;
+    } else if(mrsG>mrsM){
+      callout.innerHTML=`Gilligan's <b><span class="eq">MRS<sub>G</sub> (${mrsG.toFixed(2)})</span></b> is higher than Mary Ann's <b><span class="eq">MRS<sub>M</sub> (${mrsM.toFixed(2)})</span></b>. The shaded <b>lens</b> shows all reallocations that make both people at least as well off — trade toward the purple <b>contract curve</b> would be mutually beneficial.`;
+    } else {
+      callout.innerHTML=`Mary Ann's <b><span class="eq">MRS<sub>M</sub> (${mrsM.toFixed(2)})</span></b> is higher than Gilligan's <b><span class="eq">MRS<sub>G</sub> (${mrsG.toFixed(2)})</span></b>. The shaded <b>lens</b> shows all reallocations that make both people at least as well off — trade toward the purple <b>contract curve</b> would be mutually beneficial.`;
+    }
+  }
+
+  // Keeps the price slider synced to the freshly computed equilibrium
+  // whenever the endowment or preferences change (user can still drag it
+  // away afterward to explore non-market-clearing price lines).
+  function syncPriceToEquilibrium(){
+    if(!prices.classList.contains('on')) return;
+    const xG=+gb.value, yG=+gc.value, aG=+ag.value, aM=+am.value;
+    const xGc=Math.max(0.3,Math.min(TX-0.3,xG));
+    const yGc=Math.max(0.3,Math.min(TY-0.3,yG));
+    const aGc=Math.max(0.02,Math.min(0.98,aG));
+    const aMc=Math.max(0.02,Math.min(0.98,aM));
+    const eq=computeEquilibrium(xGc,yGc,aGc,aMc);
+    if(eq){
+      const clamped=Math.max(+priceSlider.min,Math.min(+priceSlider.max,eq.p));
+      priceSlider.value=clamped.toFixed(2);
+      priceL.textContent=clamped.toFixed(2);
+    }
+  }
+
+  // --- Event bindings ---
+  gb.addEventListener('input',()=>{gbL.textContent=gb.value;syncPriceToEquilibrium();compute();});
+  gc.addEventListener('input',()=>{gcL.textContent=gc.value;syncPriceToEquilibrium();compute();});
+  ag.addEventListener('input',()=>{agL.textContent=(+ag.value).toFixed(2);syncPriceToEquilibrium();compute();});
+  am.addEventListener('input',()=>{amL.textContent=(+am.value).toFixed(2);syncPriceToEquilibrium();compute();});
+  priceSlider.addEventListener('input',()=>{priceL.textContent=(+priceSlider.value).toFixed(2);compute();});
+
+  barter.addEventListener('click',()=>{
+    barter.classList.add('on');
+    prices.classList.remove('on');
+    compute();
+  });
+  prices.addEventListener('click',()=>{
+    prices.classList.add('on');
+    barter.classList.remove('on');
+    syncPriceToEquilibrium();
+    compute();
+  });
+
+  curveToggle.addEventListener('click',()=>{
+    curveToggle.classList.toggle('on');
+    compute();
+  });
+
+  lensToggle.addEventListener('click',()=>{
+    lensToggle.classList.toggle('on');
+    compute();
+  });
+
+  document.querySelector('[data-el="resetBtn"]').addEventListener('click',()=>{
+    gb.value=50; gc.value=50; ag.value=0.5; am.value=0.5;
+    gbL.textContent='50'; gcL.textContent='50';
+    agL.textContent='0.50'; amL.textContent='0.50';
+    syncPriceToEquilibrium();
+    compute();
+  });
+
+  compute();
+})();
+</script>
+</body>
+</html>
