@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surplus, Taxes, Price Controls & Quotas — Interactive Microeconomics</title>
+<!--
+  Intermediate Microeconomics · Open Interactive Toolkit
+  License: CC BY 4.0 — free to use, share, and adapt with attribution.
+  Static coordinate system · animated economic objects only · dynamic legend · textbook notation.
+-->
+<style>
+  :root{
+    --acc:#4F46E5; --acc-d:#3730A3; --acc-t:#EEF2FF;
+    --pos:#0F766E; --neg:#B91C1C; --gold:#B45309; --amber:#D97706; --teal:#0891B2; --violet:#7C3AED;
+    --ink:#0F172A; --body:#334155; --slate:#64748B; --mut:#94A3B8;
+    --paper:#F6F7FB; --card:#FFFFFF; --line:#E5E9F0;
+    --radius-lg:16px; --radius-md:12px; --radius-sm:9px;
+    --shadow-card:0 1px 2px rgba(15,23,42,.04), 0 10px 26px rgba(15,23,42,.05);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:980px;margin:0 auto;padding:26px 18px 44px;}
+  .title{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd{border-left:5px solid var(--acc);padding:2px 0 2px 16px;margin:16px 0 6px;}
+  .kicker{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd h1{font-size:22px;line-height:1.25;margin-top:3px;font-weight:800;letter-spacing:-.01em;}
+  .lede{font-size:14px;color:var(--body);margin:10px 0 2px;max-width:730px;}
+
+  .tryit{background:var(--card);border-left:4px solid var(--acc);border-radius:var(--radius-md);
+    padding:14px 18px;margin:16px 0 4px;font-size:13.5px;color:var(--body);box-shadow:var(--shadow-card);
+    max-width:900px;}
+  .tryit .lbl{color:var(--ink);font-weight:800;}
+  .tryit .hl{color:var(--acc-d);font-weight:800;}
+  .sym{font-style:italic;font-family:Georgia,"Times New Roman",serif;}
+  .sym sub{font-size:.72em;}
+
+  .grid{display:grid;grid-template-columns:1.18fr .82fr;gap:16px;margin-top:16px;align-items:start;}
+  @media(max-width:760px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--card);border-radius:var(--radius-lg);padding:18px 20px;border:1px solid var(--line);box-shadow:var(--shadow-card);}
+  .graphcard{padding:16px 16px 14px;}
+  .card h3{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#7A88A0;margin-bottom:12px;font-weight:800;}
+  svg{width:100%;height:auto;display:block;border-radius:10px;}
+  .hint{font-size:11.5px;color:var(--mut);margin-top:10px;text-align:center;font-weight:600;}
+
+  .ctl{margin:12px 0;}
+  .ctl label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:6px;}
+  .ctl label b{color:var(--acc);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:7px;background:var(--line);outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:21px;height:21px;border-radius:50%;
+    background:#fff;border:4px solid var(--acc);cursor:pointer;box-shadow:0 2px 7px rgba(15,23,42,.22);transition:transform .12s;}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.08);}
+  input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;background:#fff;border:4px solid var(--acc);cursor:pointer;}
+
+  .stats{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:64px;background:var(--paper);border-radius:var(--radius-sm);padding:10px 4px;text-align:center;}
+  .stat .big{font-size:18px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;transition:color .2s;}
+  .stat .lab{font-size:9px;color:var(--slate);text-transform:uppercase;letter-spacing:.03em;margin-top:4px;font-weight:700;}
+  .note{margin-top:12px;padding:9px 13px;border-radius:var(--radius-sm);background:var(--acc-t);font-size:12px;text-align:center;font-weight:700;color:var(--acc-d);font-variant-numeric:tabular-nums;}
+  .callout{margin-top:12px;padding:12px 14px;border-radius:var(--radius-sm);background:var(--paper);font-size:12.5px;color:var(--body);min-height:56px;}
+  .callout b{color:var(--ink);}
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px;}
+  .preset{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--ink);transition:.15s;}
+  .preset:hover{border-color:var(--acc);background:var(--acc);color:#fff;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;min-height:30px;align-items:center;}
+  .legend span{display:inline-flex;align-items:center;gap:7px;background:var(--paper);border:1px solid var(--line);
+    border-radius:20px;padding:6px 13px;font-size:12px;font-weight:700;color:var(--body);transition:.2s;}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none;}
+  .legend .empty{color:var(--mut);font-style:italic;font-weight:600;background:none;border:none;padding:0;}
+
+  .foot{font-size:11px;color:var(--mut);margin-top:20px;text-align:center;}
+
+  .modewrap{display:flex;background:var(--paper);border-radius:var(--radius-md);padding:4px;gap:4px;margin-bottom:14px;flex-wrap:wrap;}
+  .modebtn{flex:1;min-width:100px;border:none;background:transparent;padding:10px 6px;border-radius:9px;font-size:12px;font-weight:800;
+    color:var(--slate);cursor:pointer;transition:.15s;}
+  .modebtn.active{background:var(--acc);color:#fff;box-shadow:0 3px 8px rgba(79,70,229,.35);}
+
+  .wm-hd{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#7A88A0;font-weight:800;margin:16px 0 9px;
+    border-top:1px dashed var(--line);padding-top:14px;}
+  .checks{display:flex;gap:16px;flex-wrap:wrap;margin:4px 0 2px;font-size:12.5px;font-weight:700;}
+  .checks label{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--ink);}
+  .checks input{width:16px;height:16px;accent-color:var(--acc);cursor:pointer;}
+  .formula{margin-top:12px;padding:10px 13px;border-radius:var(--radius-sm);background:#FFF7ED;border:1px solid #FDE7C7;
+    font-size:12.5px;font-weight:800;text-align:center;color:var(--gold);font-variant-numeric:tabular-nums;display:none;}
+  .formula.show{display:block;}
+  #wtooltip{position:fixed;pointer-events:none;background:#0F172A;color:#fff;font-size:12px;
+    padding:8px 11px;border-radius:8px;max-width:230px;line-height:1.4;box-shadow:0 8px 20px rgba(15,23,42,.28);
+    opacity:0;transition:opacity .12s;z-index:60;}
+  .shaded{cursor:pointer;transition:opacity .12s;}
+
+  .movebtn{width:100%;margin-top:10px;border:none;background:linear-gradient(135deg,var(--acc),var(--acc-d));
+    color:#fff;font-weight:800;font-size:12.5px;padding:11px;border-radius:var(--radius-sm);cursor:pointer;
+    box-shadow:0 4px 10px rgba(79,70,229,.3);transition:transform .12s;}
+  .movebtn:hover{transform:translateY(-1px);}
+  .movebtn:active{transform:translateY(0);}
+  .pricebadge{font-weight:800;font-variant-numeric:tabular-nums;}
+
+  .quotabadge{color:var(--violet);}
+  .explainbox{margin-top:12px;padding:12px 14px;border-radius:var(--radius-sm);background:#F5F3FF;border:1px solid #E4DEFB;
+    font-size:12.5px;color:#4C3A99;min-height:48px;}
+  .explainbox b{color:var(--violet);}
+
+  .elastic-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  @media(max-width:480px){.elastic-grid{grid-template-columns:1fr;}}
+  .elastic-item{font-size:11.5px;padding:9px 11px;border-radius:8px;background:var(--paper);color:var(--slate);
+    border:1.5px solid transparent;font-weight:700;transition:.2s;line-height:1.35;}
+  .elastic-item.active{background:var(--acc-t);border-color:var(--acc);color:var(--acc-d);}
+  .burden-track{position:relative;height:36px;border-radius:10px;overflow:hidden;background:var(--paper);
+    display:flex;margin-top:6px;}
+  .burden-buyer,.burden-seller{height:100%;display:flex;align-items:center;justify-content:center;color:#fff;
+    font-weight:800;font-size:11.5px;transition:width .45s cubic-bezier(.4,0,.2,1);white-space:nowrap;overflow:hidden;}
+  .burden-buyer{background:linear-gradient(135deg,#4F46E5,#6366F1);}
+  .burden-seller{background:linear-gradient(135deg,#0F766E,#0D9488);}
+
+  /* Left column stacks the graph card and the elasticity/incidence card tightly,
+     independent of how tall the Controls card (right column) happens to be. */
+  .left-col{display:flex;flex-direction:column;gap:16px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">Intermediate Microeconomics · Interactive Toolkit</div>
+
+  <section id="pane-st">
+    <div class="hd"><div class="kicker">Market equilibrium: supply and demand</div><h1>Surplus, Taxes, Price Controls &amp; Quotas</h1></div>
+    <p class="lede">Explore how markets create value — and what happens when policy gets in the way. Switch modes below: analyze a per-unit <b>tax</b>, drag the <b>market price</b> away from equilibrium, or impose a <b>quantity cap</b> and watch deadweight loss appear as legal trades are blocked.</p>
+
+    <div class="tryit" id="tryitTax">
+      <span class="lbl">Try it:</span> In <span class="hl">Tax Analysis</span> mode, drag <span class="hl">Per-unit tax (t)</span> up to 30 — watch the red <span class="hl">deadweight loss</span> triangle open up between <span class="sym">Q<sub>t</sub></span> and <span class="sym">Q*</span>. Now drag <span class="hl">Supply steepness</span> down toward 0.4 (inelastic supply) and check the <span class="hl">Elasticity &amp; Tax Incidence</span> panel below the graph: the burden bar shifts toward "Sellers" because inelastic supply can't dodge the tax.
+    </div>
+    <div class="tryit" id="tryitPrice" style="display:none;">
+      <span class="lbl">Try it:</span> Switch to <span class="hl">Market Price</span> mode and drag the price slider <span class="hl">above</span> equilibrium — watch the amber <span class="hl">excess supply</span> band appear between <span class="sym">Q<sub>d</sub></span> and <span class="sym">Q<sub>s</sub></span>. Then drag it <span class="hl">below</span> equilibrium to see a teal <span class="hl">excess demand</span> band instead, and hit <span class="hl">Move to Equilibrium</span> to snap the price back and clear the market.
+    </div>
+    <div class="tryit" id="tryitQuota" style="display:none;">
+      <span class="lbl">Try it:</span> Switch to <span class="hl">Quantity Restriction</span> mode and pull the cap <span class="sym">Q̄</span> below <span class="sym">Q*</span> — notice the same <span class="hl">deadweight loss</span> triangle reappear, this time carved out by a quota instead of a tax, as the market price rises above equilibrium.
+    </div>
+
+    <div class="grid">
+      <div class="left-col">
+        <div class="card graphcard"><h3 id="plotTitle">Market diagram</h3>
+          <svg id="plot" viewBox="0 0 520 380" role="img" aria-label="Supply and demand diagram with surplus regions, tax wedge, price control, and quantity restriction"></svg>
+          <div class="legend" id="legend"></div>
+          <div class="hint">Axes and origin are fixed — only curves, points, and shaded regions move.</div>
+        </div>
+
+        <!-- Elasticity & Tax Incidence now sits directly below the legend, stacked with the graph card -->
+        <div class="card" id="elasticityCard">
+          <h3>Elasticity &amp; Tax Incidence</h3>
+          <div class="elastic-grid">
+            <div class="elastic-item" id="eiDemEla">📉 <b>Demand is more elastic</b> — buyers can easily switch away or delay purchases, so they escape most of the tax.</div>
+            <div class="elastic-item" id="eiDemIne">📈 <b>Demand is more inelastic</b> — buyers have few alternatives, so they absorb more of the tax.</div>
+            <div class="elastic-item" id="eiSupEla">📉 <b>Supply is more elastic</b> — sellers can easily adjust output, so they escape most of the tax.</div>
+            <div class="elastic-item" id="eiSupIne">📈 <b>Supply is more inelastic</b> — sellers can't easily adjust, so they absorb more of the tax.</div>
+          </div>
+
+          <div class="burden-track" id="burdenTrack">
+            <div class="burden-buyer" id="burdenBuyer">Buyers 50%</div>
+            <div class="burden-seller" id="burdenSeller">Sellers 50%</div>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><div class="big" id="buyerShareStat" style="color:#4F46E5">50%</div><div class="lab">Buyer share</div></div>
+            <div class="stat"><div class="big" id="sellerShareStat" style="color:#0F766E">50%</div><div class="lab">Seller share</div></div>
+          </div>
+
+          <div class="callout" id="elasticitySentence" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div class="card"><h3>Controls</h3>
+
+        <div class="modewrap">
+          <button class="modebtn active" id="modeTaxBtn">Tax Analysis</button>
+          <button class="modebtn" id="modePriceBtn">Market Price</button>
+          <button class="modebtn" id="modeQuotaBtn">Quantity Restriction</button>
+        </div>
+
+        <div class="ctl"><label><span>Demand steepness</span><b id="bL">1.0</b></label><input type="range" id="b" min="0.4" max="2.2" value="1.0" step="0.1"></div>
+        <div class="ctl"><label><span>Supply steepness</span><b id="dL">1.0</b></label><input type="range" id="d" min="0.4" max="2.2" value="1.0" step="0.1"></div>
+
+        <div id="taxControls">
+          <div class="ctl"><label><span>Per-unit tax (t)</span><b id="tL">0</b></label><input type="range" id="t" min="0" max="60" value="0" step="1"></div>
+          <div class="stats">
+            <div class="stat"><div class="big" id="qv" style="color:var(--acc)">–</div><div class="lab">Quantity</div></div>
+            <div class="stat"><div class="big" id="rev" style="color:var(--gold)">–</div><div class="lab">Tax rev</div></div>
+            <div class="stat"><div class="big" id="dwl" style="color:var(--neg)">–</div><div class="lab">DWL</div></div>
+          </div>
+        </div>
+
+        <div id="priceControls" style="display:none;">
+          <div class="ctl"><label><span>Market price (P)</span><b id="priceL" class="pricebadge">–</b></label>
+            <input type="range" id="price" min="1" max="99" value="70" step="0.5"></div>
+          <button class="movebtn" id="moveBtn">⟲ Move to Equilibrium</button>
+          <div class="stats">
+            <div class="stat"><div class="big" id="qd" style="color:#4F46E5">–</div><div class="lab">Qty demanded</div></div>
+            <div class="stat"><div class="big" id="qs" style="color:#0F172A">–</div><div class="lab">Qty supplied</div></div>
+            <div class="stat"><div class="big" id="gap" style="color:var(--amber)">–</div><div class="lab" id="gapLab">Gap</div></div>
+          </div>
+        </div>
+
+        <div id="quotaControls" style="display:none;">
+          <div class="ctl"><label><span>Quantity cap (Q̄)</span><b id="capL" class="quotabadge">–</b></label>
+            <input type="range" id="cap" min="0.5" max="140" value="20" step="0.5"></div>
+          <div class="stats">
+            <div class="stat"><div class="big" id="rq" style="color:var(--violet)">–</div><div class="lab">Restricted qty</div></div>
+            <div class="stat"><div class="big" id="qprice" style="color:var(--acc)">–</div><div class="lab">Market price</div></div>
+            <div class="stat"><div class="big" id="qdwl" style="color:var(--neg)">–</div><div class="lab">DWL</div></div>
+          </div>
+        </div>
+
+        <div class="note" id="inc">–</div>
+
+        <div class="wm-hd">Welfare Mode</div>
+        <div class="checks">
+          <label><input type="checkbox" id="cbCS" checked> Consumer surplus</label>
+          <label><input type="checkbox" id="cbPS" checked> Producer surplus</label>
+          <label><input type="checkbox" id="cbTS" checked> Total surplus</label>
+        </div>
+        <div class="stats">
+          <div class="stat" id="stCS"><div class="big" id="cs" style="color:#6366F1">–</div><div class="lab">Cons. surplus</div></div>
+          <div class="stat" id="stPS"><div class="big" id="ps" style="color:var(--pos)">–</div><div class="lab">Prod. surplus</div></div>
+          <div class="stat" id="stTS"><div class="big" id="ts" style="color:var(--gold)">–</div><div class="lab">Total surplus</div></div>
+        </div>
+        <div class="formula" id="formulaBox"></div>
+
+        <div class="callout" id="callout"></div>
+        <div class="explainbox" id="explainbox" style="display:none;"></div>
+        <div class="presets" id="presets"></div>
+      </div>
+    </div>
+<div id="wtooltip"></div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function elFactory(parent){
+  return (tag,at)=>{ const e=document.createElementNS(NS,tag); for(const k in at) e.setAttribute(k,at[k]); parent.appendChild(e); return e; };
+}
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
+function fmt(n){ return '$'+n.toFixed(0); }
+function fmtQ(n){ return n.toFixed(1); }
+
+(function(){
+  const $=id=>document.getElementById(id);
+
+  /* ============ FIXED, NEVER-RESCALING COORDINATE SYSTEM ============ */
+  const svgRoot=$('plot');
+  const L=54,R=506,T=18,B=330;           // fixed pixel margins
+  const A=100,C=10;                       // demand intercept, supply intercept
+  const PMAX=100, QMAX=150;               // FIXED domain — never recomputed
+  const PX=q=>L+(q/QMAX)*(R-L);
+  const PY=p=>B-(p/PMAX)*(B-T);
+
+  svgRoot.innerHTML='';
+  const axesGroup=document.createElementNS(NS,'g'); axesGroup.id='axesGroup';
+  const dynGroup=document.createElementNS(NS,'g'); dynGroup.id='dynGroup';
+  dynGroup.style.transition='opacity .25s ease';
+  svgRoot.appendChild(axesGroup); svgRoot.appendChild(dynGroup);
+  const elAx=elFactory(axesGroup);
+  const elDyn=elFactory(dynGroup);
+
+  function txt(elFn,x,y,s,attrs){
+    const e=elFn('text',Object.assign({x,y,'font-family':'Arial, sans-serif'},attrs||{}));
+    e.textContent=s; return e;
+  }
+  // Textbook-style notation: big capital letter + smaller subscript positioned beside it.
+  function econLabel(elFn,x,y,main,sub,opts={}){
+    const {mainSize=15,subSize=10,fill='#0F172A',anchor='start'}=opts;
+    const t=elFn('text',{x,y,'text-anchor':anchor,'font-family':'Georgia,"Times New Roman",serif','font-style':'italic',fill});
+    const m=document.createElementNS(NS,'tspan'); m.setAttribute('font-size',mainSize); m.textContent=main; t.appendChild(m);
+    if(sub){
+      const s=document.createElementNS(NS,'tspan'); s.setAttribute('font-size',subSize); s.setAttribute('dy','4'); s.setAttribute('dx','1'); s.textContent=sub;
+      t.appendChild(s);
+    }
+    return t;
+  }
+  // Quota notation: Q with an overline (Q̄)
+  function overlineQ(elFn,x,y,opts={}){
+    const {fill='#7C3AED',size=15,anchor='middle'}=opts;
+    const t=elFn('text',{x,y,'text-anchor':anchor,'font-family':'Georgia,"Times New Roman",serif','font-style':'italic','font-size':size,fill});
+    t.textContent='Q';
+    const half=size*0.34;
+    elFn('line',{x1:x-half,x2:x+half,y1:y-size+3,y2:y-size+3,stroke:fill,'stroke-width':1.4,'stroke-linecap':'round'});
+    return t;
+  }
+  // Equilibrium "E" label — halo-stroked so it never visually merges with the D/S lines
+  function equilibriumLabel(elFn,x,y){
+    return txt(elFn,x,y,'E',{
+      fill:'#0F172A','font-size':14,'font-weight':800,'font-style':'italic',
+      'font-family':'Georgia,"Times New Roman",serif',
+      'paint-order':'stroke','stroke':'#fff','stroke-width':5,'stroke-linejoin':'round'
+    });
+  }
+
+  const tip=$('wtooltip');
+  function showTip(text){ tip.textContent=text; tip.style.opacity=1; }
+  function moveTip(e){ tip.style.left=(e.clientX+14)+'px'; tip.style.top=(e.clientY+14)+'px'; }
+  function hideTip(){ tip.style.opacity=0; }
+
+  function shadedPoly(elFn,pts,fill,baseOp,tooltipText,extra){
+    const attrs=Object.assign({points:pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '),fill,opacity:baseOp,class:'shaded'},extra||{});
+    const p=elFn('polygon',attrs);
+    p.addEventListener('mouseenter',()=>{ p.setAttribute('opacity',Math.min(baseOp+0.24,0.92)); showTip(tooltipText); });
+    p.addEventListener('mousemove',moveTip);
+    p.addEventListener('mouseleave',()=>{ p.setAttribute('opacity',baseOp); hideTip(); });
+    return p;
+  }
+  function doubleArrow(elFn,xA,xB,y,color){
+    elFn('line',{x1:xA,y1:y,x2:xB,y2:y,stroke:color,'stroke-width':2.4,'stroke-linecap':'round'});
+    elFn('path',{d:`M${xA} ${y} l9 -5 l0 10 z`,fill:color});
+    elFn('path',{d:`M${xB} ${y} l-9 -5 l0 10 z`,fill:color});
+  }
+
+  /* ============ STATIC AXES — drawn once, NEVER redrawn/animated ============ */
+  function drawStaticAxes(){
+    elAx('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+    elAx('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+    elAx('path',{d:`M${R} ${B} l-9 -5 l0 10 z`,fill:'#0F172A'});
+    elAx('path',{d:`M${L} ${T} l-5 9 l10 0 z`,fill:'#0F172A'});
+    txt(elAx,R-4,B+26,'Quantity',{'text-anchor':'end','font-size':13,fill:'#334155','font-weight':700});
+    txt(elAx,L-8,T+2,'Price',{'text-anchor':'end','font-size':13,fill:'#334155','font-weight':700});
+  }
+  drawStaticAxes();
+
+  function drawCurves(elFn,b,d){
+    const dxi=Math.min(A/b,QMAX);
+    const dEndP=Math.max(0,A-b*dxi);
+    elFn('line',{x1:PX(0),y1:PY(A),x2:PX(dxi),y2:PY(dEndP),stroke:'#4F46E5','stroke-width':3,'stroke-linecap':'round'});
+    const sEndQ=Math.min(QMAX,(PMAX-C)/d);
+    elFn('line',{x1:PX(0),y1:PY(C),x2:PX(sEndQ),y2:PY(C+d*sEndQ),stroke:'#0F172A','stroke-width':3,'stroke-linecap':'round'});
+    txt(elFn,PX(dxi)-4,PY(dEndP)+16,'D',{fill:'#4F46E5','font-size':14,'text-anchor':'end','font-weight':700,'font-style':'italic'});
+    txt(elFn,PX(sEndQ)-2,PY(C+d*sEndQ)-6,'S',{fill:'#0F172A','font-size':14,'text-anchor':'end','font-weight':700,'font-style':'italic'});
+  }
+
+  /* ============ STATE + ANIMATION LOOP ============ */
+  let mode='tax';
+  let showCS=true, showPS=true, showTS=true;
+  const target={b:1.0,d:1.0,t:0,price:70,quotaCap:20};
+  const cur={...target};
+  let rafId=null;
+  let legendItems=[];
+
+  function loop(){
+    let active=false;
+    for(const k in target){
+      const diff=target[k]-cur[k];
+      if(Math.abs(diff)>0.01){ cur[k]+=diff*0.22; active=true; }
+      else cur[k]=target[k];
+    }
+    render(cur);
+    rafId = active ? requestAnimationFrame(loop) : null;
+  }
+  function kick(){ if(rafId===null) rafId=requestAnimationFrame(loop); }
+
+  function setStatDisplay(){
+    $('stCS').style.display=showCS?'':'none';
+    $('stPS').style.display=showPS?'':'none';
+    $('stTS').style.display=showTS?'':'none';
+  }
+  function drawWelfareFormula(CS,PS,TS){
+    const fb=$('formulaBox');
+    if(showTS){ fb.classList.add('show'); fb.textContent=`${fmt(CS)} (Consumer Surplus) + ${fmt(PS)} (Producer Surplus) = ${fmt(TS)} (Total Surplus)`; }
+    else { fb.classList.remove('show'); fb.textContent=''; }
+    if(showCS) $('cs').textContent=fmt(CS);
+    if(showPS) $('ps').textContent=fmt(PS);
+    if(showTS) $('ts').textContent=fmt(TS);
+  }
+
+  function updateElasticity(b,d){
+    // Only relevant in Tax Analysis mode — panel is hidden otherwise, but keep math safe regardless.
+    const total=b+d;
+    const buyerFrac=b/total, sellerFrac=d/total;
+    const buyerPct=buyerFrac*100, sellerPct=sellerFrac*100;
+    $('burdenBuyer').style.width=buyerPct+'%';
+    $('burdenSeller').style.width=sellerPct+'%';
+    $('burdenBuyer').textContent='Buyers '+buyerPct.toFixed(0)+'%';
+    $('burdenSeller').textContent='Sellers '+sellerPct.toFixed(0)+'%';
+    $('buyerShareStat').textContent=buyerPct.toFixed(0)+'%';
+    $('sellerShareStat').textContent=sellerPct.toFixed(0)+'%';
+    ['eiDemEla','eiDemIne','eiSupEla','eiSupIne'].forEach(id=>$(id).classList.remove('active'));
+    const diff=b-d, eps=0.05; let sentence;
+    if(Math.abs(diff)<eps){
+      sentence=`Demand and supply have <b>similar elasticity</b>, so the tax burden splits roughly evenly — buyers ${buyerPct.toFixed(0)}% vs sellers ${sellerPct.toFixed(0)}%.`;
+    } else if(diff>0){
+      $('eiDemIne').classList.add('active'); $('eiSupEla').classList.add('active');
+      sentence=`Because demand is relatively <b>inelastic</b> (and supply is relatively elastic), <b>buyers</b> bear most of the tax burden (${buyerPct.toFixed(0)}% vs ${sellerPct.toFixed(0)}%).`;
+    } else {
+      $('eiDemEla').classList.add('active'); $('eiSupIne').classList.add('active');
+      sentence=`Because supply is relatively <b>inelastic</b> (and demand is relatively elastic), <b>sellers</b> bear most of the tax burden (${sellerPct.toFixed(0)}% vs ${buyerPct.toFixed(0)}%).`;
+    }
+    $('elasticitySentence').innerHTML=sentence;
+  }
+
+  function renderLegend(){
+    const box=$('legend');
+    if(!legendItems.length){ box.innerHTML='<span class="empty">No shaded regions active — enable Consumer/Producer surplus above.</span>'; return; }
+    box.innerHTML=legendItems.map(it=>`<span><i style="background:${it.color}"></i>${it.label}</span>`).join('');
+  }
+
+  /* ============ RENDER DISPATCH ============ */
+  function render(s){
+    dynGroup.innerHTML='';
+    legendItems=[];
+    setStatDisplay();
+    const b=s.b,d=s.d;
+    const Q0=(A-C)/(b+d), P0=A-b*Q0;
+    if(mode==='tax') drawTax(s,Q0,P0);
+    else if(mode==='price') drawPrice(s,Q0,P0);
+    else drawQuota(s,Q0,P0);
+    if(mode==='tax') updateElasticity(b,d);
+    renderLegend();
+  }
+
+  /* ---------------- TAX MODE ---------------- */
+  function drawTax(s,Q0,P0){
+    const {t,b,d}=s;
+    const Qt=Math.max(0,(A-C-t)/(b+d)), Pb=A-b*Qt, Ps=Pb-t;
+    const CS=0.5*(A-Pb)*Qt, PS=0.5*(Ps-C)*Qt, TS=CS+PS, REV=t*Qt, DWL=0.5*t*(Q0-Qt);
+
+    if(Qt>0){
+      const tsStroke = showTS ? {stroke:'#B45309','stroke-width':1.4,'stroke-dasharray':'4 3'} : {};
+      if(showCS){
+        shadedPoly(elDyn,[[PX(0),PY(A)],[PX(0),PY(Pb)],[PX(Qt),PY(Pb)]],'#6366F1',0.26,
+          'Consumer surplus: value buyers get from the good minus what they pay. Current value: '+fmt(CS), tsStroke);
+        legendItems.push({color:'#6366F1',label:'Consumer surplus'});
+      }
+      if(showPS){
+        shadedPoly(elDyn,[[PX(0),PY(Ps)],[PX(0),PY(C)],[PX(Qt),PY(Ps)]],'#0F766E',0.26,
+          'Producer surplus: what sellers receive minus their cost. Current value: '+fmt(PS), tsStroke);
+        legendItems.push({color:'#0F766E',label:'Producer surplus'});
+      }
+      if(t>0){
+        shadedPoly(elDyn,[[PX(0),PY(Pb)],[PX(0),PY(Ps)],[PX(Qt),PY(Ps)],[PX(Qt),PY(Pb)]],'#B45309',0.28,
+          'Tax revenue: government take = tax per unit × quantity traded. Current value: '+fmt(REV));
+        legendItems.push({color:'#B45309',label:'Tax revenue'});
+      }
+    }
+    if(t>0){
+      shadedPoly(elDyn,[[PX(Qt),PY(Pb)],[PX(Qt),PY(Ps)],[PX(Q0),PY(P0)]],'#B91C1C',0.30,
+        'Deadweight loss: value of trades lost because of the tax. Current value: '+fmt(DWL));
+      legendItems.push({color:'#B91C1C',label:'Deadweight loss'});
+    }
+
+    drawCurves(elDyn,b,d);
+
+    if(t>0){
+      elDyn('line',{x1:PX(Qt),y1:PY(Pb),x2:L,y2:PY(Pb),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      elDyn('line',{x1:PX(Qt),y1:PY(Ps),x2:L,y2:PY(Ps),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      elDyn('line',{x1:PX(Qt),y1:B,x2:PX(Qt),y2:PY(Math.max(Pb,Ps)),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      econLabel(elDyn,L+4,PY(Pb)-5,'P','b',{fill:'#4F46E5'});
+      econLabel(elDyn,L+4,PY(Ps)+14,'P','s',{fill:'#0F172A'});
+      econLabel(elDyn,PX(Qt),B+18,'Q','t',{fill:'#B45309',anchor:'middle'});
+      elDyn('circle',{cx:PX(Qt),cy:PY(Pb),r:4.5,fill:'#0F172A',stroke:'#fff','stroke-width':1.6});
+    } else {
+      elDyn('line',{x1:PX(Q0),y1:PY(P0),x2:L,y2:PY(P0),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      elDyn('line',{x1:PX(Q0),y1:B,x2:PX(Q0),y2:PY(P0),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      econLabel(elDyn,L+4,PY(P0)-5,'P','*',{fill:'#0F172A'});
+      econLabel(elDyn,PX(Q0),B+18,'Q','*',{fill:'#0F172A',anchor:'middle'});
+      elDyn('circle',{cx:PX(Q0),cy:PY(P0),r:4.5,fill:'#0F172A',stroke:'#fff','stroke-width':1.6});
+      equilibriumLabel(elDyn,PX(Q0)+13,PY(P0)-15);
+    }
+
+    $('qv').textContent=fmtQ(Qt); $('rev').textContent=REV.toFixed(0); $('dwl').textContent=DWL.toFixed(0);
+    drawWelfareFormula(CS,PS,TS);
+
+    if(t>0){ const bu=(Pb-P0),se=(P0-Ps); $('inc').innerHTML=`Buyers bear ${bu.toFixed(1)} · Sellers bear ${se.toFixed(1)} per unit`; }
+    else $('inc').innerHTML=`Q* = ${fmtQ(Q0)}, P* = ${P0.toFixed(1)} — no tax, no DWL`;
+
+    const c=$('callout');
+    if(t===0){
+      let parts=[];
+      if(showCS) parts.push(`consumer surplus is <b>${fmt(CS)}</b>`);
+      if(showPS) parts.push(`producer surplus is <b>${fmt(PS)}</b>`);
+      let m = parts.length ? 'At equilibrium, ' + parts.join(' and ') + '.' : 'Enable a checkbox above to shade consumer or producer surplus.';
+      if(showTS && parts.length) m += ` Together they total <b>${fmt(TS)}</b> in total surplus.`;
+      c.innerHTML=m;
+    } else if(b<d-0.25) c.innerHTML='<b>Demand is flatter (more elastic) than supply</b>, so <b>sellers</b> bear more of the tax.';
+    else if(d<b-0.25) c.innerHTML='<b>Supply is flatter (more elastic) than demand</b>, so <b>buyers</b> bear more of the tax.';
+    else c.innerHTML='<b>Similar slopes</b> — buyers and sellers split the tax roughly evenly. Red triangle = deadweight loss.';
+  }
+
+  /* ---------------- PRICE MODE ---------------- */
+  function drawPrice(s,Q0,P0){
+    const b=s.b,d=s.d, P=clamp(s.price,1,99);
+    // FIX: clamp Qd/Qs to the fixed chart domain (QMAX) so markers/lines never
+    // render outside the static coordinate box at extreme slider combinations.
+    const Qd=Math.min(QMAX, Math.max(0,(A-P)/b));
+    const Qs=Math.min(QMAX, Math.max(0,(P-C)/d));
+    const Qt=Math.min(Qd,Qs);
+    const CS=(A-P)*Qt - 0.5*b*Qt*Qt, PS=(P-C)*Qt - 0.5*d*Qt*Qt, TS=CS+PS;
+    const gap=Math.abs(Qd-Qs);
+    const state = gap<0.15 ? 'clear' : (P>P0 ? 'surplus' : 'shortage');
+    const PdQt=A-b*Qt, PsQt=C+d*Qt;
+    const tsStroke = showTS ? {stroke:'#B45309','stroke-width':1.4,'stroke-dasharray':'4 3'} : {};
+
+    if(Qt>0){
+      if(showCS){
+        shadedPoly(elDyn,[[PX(0),PY(A)],[PX(Qt),PY(PdQt)],[PX(Qt),PY(P)],[PX(0),PY(P)]],'#6366F1',0.26,
+          'Consumer surplus: value to buyers who actually get the good, above the price they pay. Current value: '+fmt(CS), tsStroke);
+        legendItems.push({color:'#6366F1',label:'Consumer surplus'});
+      }
+      if(showPS){
+        shadedPoly(elDyn,[[PX(0),PY(P)],[PX(Qt),PY(P)],[PX(Qt),PY(PsQt)],[PX(0),PY(C)]],'#0F766E',0.26,
+          'Producer surplus: revenue to sellers who actually sell, above their cost. Current value: '+fmt(PS), tsStroke);
+        legendItems.push({color:'#0F766E',label:'Producer surplus'});
+      }
+    }
+
+    drawCurves(elDyn,b,d);
+
+    elDyn('line',{x1:L,y1:PY(P),x2:R,y2:PY(P),stroke:'#0F172A','stroke-width':1.6,'stroke-dasharray':'6 4',opacity:.65});
+    econLabel(elDyn,R-14,PY(P)-6,'P',null,{fill:'#0F172A',anchor:'end'});
+
+    elDyn('line',{x1:PX(Qd),y1:B,x2:PX(Qd),y2:PY(P),stroke:'#4F46E5','stroke-width':1.4,'stroke-dasharray':'4 3'});
+    elDyn('circle',{cx:PX(Qd),cy:PY(P),r:4,fill:'#4F46E5',stroke:'#fff','stroke-width':1.4});
+    econLabel(elDyn,PX(Qd),B+18,'Q','d',{fill:'#4F46E5',anchor:'middle',mainSize:13});
+
+    elDyn('line',{x1:PX(Qs),y1:B,x2:PX(Qs),y2:PY(P),stroke:'#0F172A','stroke-width':1.4,'stroke-dasharray':'4 3'});
+    elDyn('circle',{cx:PX(Qs),cy:PY(P),r:4,fill:'#0F172A',stroke:'#fff','stroke-width':1.4});
+    econLabel(elDyn,PX(Qs),B+31,'Q','s',{fill:'#0F172A',anchor:'middle',mainSize:13});
+
+    if(state!=='clear'){
+      const qLo=Math.min(Qd,Qs), qHi=Math.max(Qd,Qs);
+      const xLo=PX(qLo), xHi=PX(qHi), y=PY(P);
+      const color = state==='surplus' ? '#D97706' : '#0891B2';
+      const tipText = state==='surplus'
+        ? `Excess supply: at this price, quantity supplied exceeds quantity demanded by ${fmtQ(gap)} units. Sellers can't find enough buyers — price tends to fall.`
+        : `Excess demand: at this price, quantity demanded exceeds quantity supplied by ${fmtQ(gap)} units. Buyers can't find enough goods — price tends to rise.`;
+      shadedPoly(elDyn,[[xLo,y-7],[xHi,y-7],[xHi,y+7],[xLo,y+7]],color,0.30,tipText);
+      legendItems.push({color, label: state==='surplus' ? 'Excess supply' : 'Excess demand'});
+      const arrowY=clamp(y+26,T+14,B-14);
+      elDyn('line',{x1:xLo,y1:y,x2:xLo,y2:arrowY,stroke:color,'stroke-width':1.2,'stroke-dasharray':'3 3'});
+      elDyn('line',{x1:xHi,y1:y,x2:xHi,y2:arrowY,stroke:color,'stroke-width':1.2,'stroke-dasharray':'3 3'});
+      doubleArrow(elDyn,xLo+3,xHi-3,arrowY,color);
+    } else {
+      elDyn('line',{x1:PX(Q0),y1:B,x2:PX(Q0),y2:PY(P0),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      elDyn('circle',{cx:PX(Q0),cy:PY(P0),r:4.5,fill:'#0F172A',stroke:'#fff','stroke-width':1.6});
+      equilibriumLabel(elDyn,PX(Q0)+13,PY(P0)-15);
+      econLabel(elDyn,PX(Q0),B+18,'Q','*',{fill:'#0F172A',anchor:'middle'});
+    }
+
+    $('qd').textContent=fmtQ(Qd); $('qs').textContent=fmtQ(Qs);
+    $('gapLab').textContent = state==='surplus' ? 'Excess Supply' : state==='shortage' ? 'Excess Demand' : 'Gap';
+    $('gap').textContent = state==='clear' ? '0.0' : fmtQ(gap);
+    $('gap').style.color = state==='surplus' ? 'var(--amber)' : state==='shortage' ? 'var(--teal)' : 'var(--slate)';
+    drawWelfareFormula(CS,PS,TS);
+
+    if(state==='clear') $('inc').innerHTML=`Market clears at P = ${P.toFixed(1)}: <span class="sym">Q<sub>d</sub></span> = <span class="sym">Q<sub>s</sub></span> = ${fmtQ(Qt)} — no shortage, no surplus.`;
+    else if(state==='surplus') $('inc').innerHTML=`Price ${P.toFixed(1)} is <b>above</b> equilibrium (${P0.toFixed(1)}) → <b>Excess Supply</b> of ${fmtQ(gap)} units.`;
+    else $('inc').innerHTML=`Price ${P.toFixed(1)} is <b>below</b> equilibrium (${P0.toFixed(1)}) → <b>Excess Demand</b> of ${fmtQ(gap)} units.`;
+
+    const c=$('callout');
+    if(state==='clear') c.innerHTML='At this price, the quantity buyers want to purchase exactly matches what sellers want to supply — the market is <b>in equilibrium</b>.';
+    else if(state==='surplus') c.innerHTML='When price is set <b>above</b> equilibrium, sellers want to sell more than buyers want to buy. Unsold inventory piles up, pushing the price back <b>down</b> toward equilibrium.';
+    else c.innerHTML='When price is set <b>below</b> equilibrium, buyers want more than sellers are willing to provide. The shortage puts <b>upward</b> pressure on price, pulling it back toward equilibrium.';
+  }
+
+  /* ---------------- QUOTA MODE ---------------- */
+  function drawQuota(s,Q0,P0){
+    const b=s.b,d=s.d, cap=clamp(s.quotaCap,0.1,QMAX);
+    const binding = cap < Q0-0.05;
+    const Qr = binding ? cap : Q0;
+    const Pd = A - b*Qr, Ps = C + d*Qr;
+    const CS=(A-Pd)*Qr - 0.5*b*Qr*Qr, PS=(Pd-C)*Qr - 0.5*d*Qr*Qr, TS=CS+PS;
+    const DWL = binding ? 0.5*(Pd-Ps)*(Q0-Qr) : 0;
+    const tsStroke = showTS ? {stroke:'#B45309','stroke-width':1.4,'stroke-dasharray':'4 3'} : {};
+
+    if(Qr>0){
+      if(showCS){
+        shadedPoly(elDyn,[[PX(0),PY(A)],[PX(0),PY(Pd)],[PX(Qr),PY(Pd)]],'#6366F1',0.26,
+          'Consumer surplus: value buyers get from the units they can still buy, above the market price. Current value: '+fmt(CS), tsStroke);
+        legendItems.push({color:'#6366F1',label:'Consumer surplus'});
+      }
+      if(showPS){
+        shadedPoly(elDyn,[[PX(0),PY(Pd)],[PX(Qr),PY(Pd)],[PX(Qr),PY(Ps)],[PX(0),PY(C)]],'#0F766E',0.26,
+          'Producer surplus: revenue sellers get, above their cost, for the units they are allowed to sell. Current value: '+fmt(PS), tsStroke);
+        legendItems.push({color:'#0F766E',label:'Producer surplus'});
+      }
+    }
+    if(binding){
+      shadedPoly(elDyn,[[PX(Qr),PY(Pd)],[PX(Qr),PY(Ps)],[PX(Q0),PY(P0)]],'#B91C1C',0.30,
+        'Deadweight loss: gains from trade that never happen because the quota forbids production and purchase beyond the cap. Current value: '+fmt(DWL));
+      legendItems.push({color:'#B91C1C',label:'Deadweight loss'});
+    }
+
+    drawCurves(elDyn,b,d);
+
+    const capColor = binding ? '#7C3AED' : '#94A3B8';
+    elDyn('line',{x1:PX(cap),y1:B,x2:PX(cap),y2:T,stroke:capColor,'stroke-width':2,'stroke-dasharray':'6 4'});
+    overlineQ(elDyn,PX(cap),T-6,{fill:capColor});
+
+    if(binding){
+      elDyn('line',{x1:PX(Qr),y1:PY(Pd),x2:L,y2:PY(Pd),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      elDyn('line',{x1:PX(Qr),y1:PY(Ps),x2:L,y2:PY(Ps),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      econLabel(elDyn,L+4,PY(Pd)-5,'P','b',{fill:'#7C3AED'});
+      econLabel(elDyn,L+4,PY(Ps)+14,'P','s',{fill:'#0F172A'});
+      elDyn('circle',{cx:PX(Qr),cy:PY(Pd),r:4.5,fill:'#7C3AED',stroke:'#fff','stroke-width':1.6});
+      elDyn('circle',{cx:PX(Q0),cy:PY(P0),r:3.5,fill:'#94A3B8',stroke:'#fff','stroke-width':1.3});
+      econLabel(elDyn,PX(Q0),B+18,'Q','*',{fill:'#94A3B8',anchor:'middle'});
+    } else {
+      elDyn('line',{x1:PX(Q0),y1:PY(P0),x2:L,y2:PY(P0),stroke:'#CBD5E1','stroke-width':1.3,'stroke-dasharray':'4 4'});
+      elDyn('circle',{cx:PX(Q0),cy:PY(P0),r:4.5,fill:'#0F172A',stroke:'#fff','stroke-width':1.6});
+      equilibriumLabel(elDyn,PX(Q0)+13,PY(P0)-15);
+      econLabel(elDyn,PX(Q0),B+18,'Q','*',{fill:'#0F172A',anchor:'middle'});
+    }
+
+    $('rq').textContent=fmtQ(Qr); $('qprice').textContent=Pd.toFixed(1); $('qdwl').textContent=DWL.toFixed(0);
+    drawWelfareFormula(CS,PS,TS);
+
+    if(binding) $('inc').innerHTML=`Quota caps quantity at <b>${fmtQ(Qr)}</b> (vs. equilibrium ${fmtQ(Q0)}) → market price rises to <b>$${Pd.toFixed(1)}</b>.`;
+    else $('inc').innerHTML=`Q̄ = ${fmtQ(cap)} exceeds Q* = ${fmtQ(Q0)} — the quota isn't binding, market sits at equilibrium.`;
+
+    const c=$('callout');
+    if(!binding) c.innerHTML='The cap is set <b>above</b> the free-market quantity, so it has no effect — the market clears normally at equilibrium.';
+    else if(cap<0.6) c.innerHTML='The quota is extremely tight — almost no trade is permitted, so nearly all potential gains from trade are lost.';
+    else c.innerHTML=`The quota shrinks trade from <b>${fmtQ(Q0)}</b> to <b>${fmtQ(Qr)}</b> units. The gap between the price buyers now pay (<b>$${Pd.toFixed(1)}</b>) and sellers' marginal cost (<b>$${Ps.toFixed(1)}</b>) is pure waste — the red triangle.`;
+
+    const eb=$('explainbox'); eb.style.display='';
+    if(!binding){
+      eb.innerHTML=`<b>No blocked trades.</b> Since the cap (${fmtQ(cap)}) is above the equilibrium quantity (${fmtQ(Q0)}), every mutually beneficial trade up to Q* still happens.`;
+    } else {
+      eb.innerHTML=`<b>Why trades between ${fmtQ(Qr)} and ${fmtQ(Q0)} units don't happen:</b> for every quantity in that range, a buyer is willing to pay more than a seller's cost to produce one more unit. But the quota makes trading beyond ${fmtQ(Qr)} units illegal, so those willing buyers and sellers never meet. The lost value — <b>${fmt(DWL)}</b> — is the deadweight loss (red triangle).`;
+    }
+  }
+
+  /* ---------------- MODE SWITCH (with fade) ---------------- */
+  function setMode(m){
+    mode=m;
+    $('modeTaxBtn').classList.toggle('active', m==='tax');
+    $('modePriceBtn').classList.toggle('active', m==='price');
+    $('modeQuotaBtn').classList.toggle('active', m==='quota');
+    $('taxControls').style.display = m==='tax' ? '' : 'none';
+    $('priceControls').style.display = m==='price' ? '' : 'none';
+    $('quotaControls').style.display = m==='quota' ? '' : 'none';
+    $('tryitTax').style.display = m==='tax' ? '' : 'none';
+    $('tryitPrice').style.display = m==='price' ? '' : 'none';
+    $('tryitQuota').style.display = m==='quota' ? '' : 'none';
+    $('plotTitle').textContent = m==='tax' ? 'Market equilibrium (with optional tax wedge)' :
+                                  m==='price' ? 'Market price control (shortage / surplus)' :
+                                  'Quantity restriction (quota) & deadweight loss';
+    $('explainbox').style.display = m==='quota' ? '' : 'none';
+
+    // Elasticity & Tax Incidence panel only makes sense in Tax Analysis mode.
+    $('elasticityCard').style.display = m==='tax' ? '' : 'none';
+
+    dynGroup.style.opacity='0';
+    kick();
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ dynGroup.style.opacity='1'; }));
+  }
+  $('modeTaxBtn').addEventListener('click',()=>setMode('tax'));
+  $('modePriceBtn').addEventListener('click',()=>setMode('price'));
+  $('modeQuotaBtn').addEventListener('click',()=>setMode('quota'));
+
+  /* ---------------- BINDINGS ---------------- */
+  function bindSlider(id,key,decimals){
+    $(id).addEventListener('input',e=>{
+      const v=parseFloat(e.target.value);
+      target[key]=v;
+      $(id+'L').textContent = decimals!=null ? v.toFixed(decimals) : v;
+      kick();
+    });
+  }
+  bindSlider('t','t',0);
+  bindSlider('b','b',1);
+  bindSlider('d','d',1);
+  bindSlider('price','price',1);
+  bindSlider('cap','quotaCap',1);
+
+  $('cbCS').addEventListener('change',e=>{ showCS=e.target.checked; kick(); });
+  $('cbPS').addEventListener('change',e=>{ showPS=e.target.checked; kick(); });
+  $('cbTS').addEventListener('change',e=>{ showTS=e.target.checked; kick(); });
+
+  $('moveBtn').addEventListener('click',()=>{
+    const Q0=(A-C)/(target.b+target.d);
+    target.price = A-target.b*Q0;
+    $('price').value=target.price;
+    $('priceL').textContent=target.price.toFixed(1);
+    kick();
+  });
+
+  [['No tax',0,1,1],['Tax = 30',30,1,1],['Inelastic demand',30,2.0,0.6],['Inelastic supply',30,0.6,2.0]].forEach(p=>{
+    const bt=document.createElement('button'); bt.className='preset'; bt.textContent=p[0];
+    bt.onclick=()=>{
+      setMode('tax');
+      target.t=p[1]; target.b=p[2]; target.d=p[3];
+      $('t').value=target.t; $('b').value=target.b; $('d').value=target.d;
+      $('tL').textContent=target.t; $('bL').textContent=target.b.toFixed(1); $('dL').textContent=target.d.toFixed(1);
+      kick();
+    };
+    $('presets').appendChild(bt);
+  });
+
+  [['No quota',999],['Tight quota (~40% of Q*)',0.4],['Mild quota (~75% of Q*)',0.75]].forEach(p=>{
+    const bt=document.createElement('button'); bt.className='preset'; bt.textContent=p[0];
+    bt.onclick=()=>{
+      setMode('quota');
+      const Q0=(A-C)/(target.b+target.d);
+      target.quotaCap = p[1]===999 ? 140 : Q0*p[1];
+      $('cap').value=target.quotaCap;
+      $('capL').textContent=target.quotaCap.toFixed(1);
+      kick();
+    };
+    $('presets').appendChild(bt);
+  });
+
+  $('priceL').textContent = target.price.toFixed(1);
+  $('capL').textContent = target.quotaCap.toFixed(1);
+  setMode('tax'); // ensures elasticityCard visibility is set correctly on load
+  render(cur);
+})();
+</script>
+</body>
+</html>
