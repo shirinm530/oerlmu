@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monopoly Equilibrium — Interactive Microeconomics Toolkit</title>
+<style>
+  :root{
+    --acc:#4F46E5; --acc-d:#3730A3; --acc-t:#EEF2FF;
+    --teal:#0F766E; --teal-t:#ECFDF9;
+    --amber:#B45309;
+    --purple:#7C3AED; --purple-t:#F5F3FF;
+    --red:#B91C1C; --red-t:#FEF2F2;
+    --ink:#0F172A; --body:#334155; --slate:#64748B; --mut:#94A3B8;
+    --paper:#F6F7FB; --card:#FFFFFF; --line:#E5E9F0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1160px;margin:0 auto;padding:22px 18px 44px;}
+  .title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd{border-left:5px solid var(--acc);padding:1px 0 1px 15px;margin-bottom:4px;margin-top:14px;}
+  .kicker{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd h1{font-size:21px;line-height:1.2;margin-top:2px;font-weight:800;}
+  .lede{font-size:14px;color:var(--body);margin:9px 0 2px;max-width:760px;}
+
+  /* ---- try-it callout ---- */
+  .tryit{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:5px solid var(--acc);
+    border-radius:12px;
+    padding:14px 18px;
+    margin:14px 0 6px;
+    font-size:13.5px;
+    color:var(--body);
+    line-height:1.65;
+    max-width:820px;
+  }
+  .tryit b{color:var(--ink);}
+  .tryit .tryLabel{color:var(--acc-d);font-weight:800;}
+
+  /* ---- mode switcher ---- */
+  .modeNav{display:flex;gap:8px;margin-top:16px;margin-bottom:2px;flex-wrap:wrap;}
+  .modeBtn{padding:10px 18px;border-radius:11px;border:1px solid var(--line);background:#fff;
+    font-size:12.5px;font-weight:800;color:var(--body);cursor:pointer;transition:.15s;letter-spacing:.01em;}
+  .modeBtn:hover{border-color:var(--acc);color:var(--acc-d);background:var(--acc-t);}
+  .modeBtn.active{background:var(--acc);color:#fff;border-color:var(--acc);}
+  .modeBtn.active:hover{background:var(--acc-d);color:#fff;}
+  .pane{display:none;}
+  .pane.active{display:block;}
+
+  .grid{display:grid;grid-template-columns:1.35fr .78fr;gap:15px;margin-top:14px;align-items:start;}
+  @media(max-width:820px){.grid{grid-template-columns:1fr;}}
+
+  .leftCol{display:flex;flex-direction:column;gap:15px;min-width:0;}
+  .rightCol{display:flex;flex-direction:column;gap:15px;min-width:0;}
+
+  .card{background:var(--card);border-radius:14px;padding:16px 18px;border:1px solid var(--line);}
+  .card h3{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#7A88A0;margin-bottom:10px;font-weight:800;}
+  svg{width:100%;height:auto;display:block;}
+
+  .graphHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px;}
+  .graphHead h3{margin-bottom:0;}
+
+  .switchRow{display:flex;align-items:center;gap:8px;}
+  .switchRow span{font-size:11.5px;font-weight:800;color:var(--body);white-space:nowrap;}
+  .switch{position:relative;width:40px;height:22px;flex:0 0 auto;}
+  .switch input{opacity:0;width:0;height:0;position:absolute;}
+  .slider-tog{position:absolute;inset:0;background:var(--line);border-radius:22px;cursor:pointer;transition:background .25s;}
+  .slider-tog::before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;
+    border-radius:50%;transition:transform .25s;box-shadow:0 1px 3px rgba(15,23,42,.3);}
+  .switch input:checked + .slider-tog{background:var(--acc);}
+  .switch input:checked + .slider-tog::before{transform:translateX(18px);}
+
+  .legend{display:grid;grid-template-columns:repeat(2,1fr);gap:7px 14px;font-size:12px;color:var(--body);margin-top:12px;font-weight:700;}
+  .legend .item{display:flex;align-items:center;gap:7px;}
+  .legend i{display:inline-block;width:14px;height:10px;border-radius:3px;flex:0 0 auto;}
+  .legend i.line{height:0;border-top:3px solid;border-radius:0;}
+  .legend i.dashed{height:0;border-top:3px dashed;border-radius:0;}
+  .legend i.dot{width:10px;height:10px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(15,23,42,.15);}
+
+  .outcome-list{display:flex;flex-direction:column;gap:0;}
+  .outcome-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;
+    border-bottom:1px solid var(--line);gap:10px;}
+  .outcome-row:last-child{border-bottom:none;}
+  .outcome-row .lab{font-size:12px;font-weight:700;color:var(--body);display:flex;align-items:center;gap:7px;white-space:nowrap;}
+  .outcome-row .lab i{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+  .outcome-row .val{font-size:14.5px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;transition:color .2s;text-align:right;}
+  .outcome-row .val.dim{color:var(--mut);}
+
+  .ctl{margin:9px 0;}
+  .ctl label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px;}
+  .ctl label b{color:var(--acc);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;-webkit-appearance:none;height:7px;border-radius:7px;background:var(--line);outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:23px;height:23px;border-radius:50%;
+    background:#fff;border:4px solid var(--acc);cursor:pointer;box-shadow:0 2px 7px rgba(15,23,42,.22);}
+  input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid var(--acc);cursor:pointer;}
+
+  .resetRow{margin-top:14px;}
+  .btn{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;
+    font-size:12.5px;font-weight:800;color:var(--body);cursor:pointer;transition:.15s;}
+  .btn:hover{background:var(--acc-t);color:var(--acc-d);border-color:var(--acc);}
+
+  .explainWrap{display:flex;gap:10px;align-items:flex-start;}
+  .explainIcon{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:var(--acc-t);color:var(--acc-d);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;}
+  .explainWrap p{font-size:13.5px;color:var(--body);}
+  .explainWrap p b{color:var(--ink);}
+
+  .expGrid{display:grid;grid-template-columns:1fr;gap:9px;margin-top:6px;}
+  .expBtn{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px 12px;cursor:pointer;
+    text-align:left;transition:.15s;display:flex;flex-direction:column;gap:4px;}
+  .expBtn:hover{border-color:var(--acc);background:var(--acc-t);box-shadow:0 3px 10px rgba(79,70,229,.12);}
+  .expBtn .expTitle{font-size:12.5px;font-weight:800;color:var(--ink);}
+  .expBtn .expHint{font-size:11px;color:var(--slate);line-height:1.35;}
+  .expBtn:hover .expTitle{color:var(--acc-d);}
+
+  .roadmap{font-size:11.5px;color:var(--mut);margin-top:10px;font-style:italic;}
+  .foot{font-size:11px;color:var(--mut);margin-top:22px;text-align:center;}
+
+  .welfareGroup{transition:opacity .35s ease;}
+  .rectGroup{transition:opacity .25s ease;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">Intermediate Microeconomics · Interactive Toolkit</div>
+
+  <!-- ============================================================ -->
+  <!-- MODE 1 — MONOPOLY (D + MR + MC)                              -->
+  <!-- ============================================================ -->
+  <section class="pane active" data-pane="mo" id="pane-mo">
+    <div class="hd"><div class="kicker">Monopoly</div><h1>Market Structure</h1></div>
+    <p class="lede">A monopolist is the sole seller in its market, so it faces the entire downward-sloping demand curve rather than a single going price. Because selling one more unit means lowering the price on every unit sold, marginal revenue falls below demand — and twice as fast. Profit is maximized where <b>marginal revenue equals marginal cost</b>, which pins down the monopoly quantity, Q<sub>m</sub>; reading up to demand at that quantity gives the price the market will bear, P<sub>m</sub>. Because P<sub>m</sub> sits above marginal cost, the firm earns a markup on every unit — but restricting output below the competitive level also creates a deadweight loss that no one captures.</p>
+
+    <div class="tryit">
+      <span class="tryLabel">Try it:</span> Raise the demand intercept and watch Q<sub>m</sub> and P<sub>m</sub> climb together as the whole market expands. Flatten the demand slope to make demand more elastic and see the markup over marginal cost shrink — or steepen it and watch price pull further away from cost as the deadweight-loss triangle grows. Push marginal cost up to squeeze profit from both sides, or pull it down and watch the monopoly quantity approach the efficient one. Toggle the welfare areas to separate the surplus the firm captures from the surplus that simply disappears.
+    </div>
+
+    <div class="modeNav">
+      <button type="button" class="modeBtn active" data-mode="mo">Monopoly Equilibrium</button>
+      <button type="button" class="modeBtn" data-mode="pc">Profit &amp; Costs</button>
+    </div>
+
+    <div class="grid">
+      <div class="leftCol">
+        <div class="card">
+          <div class="graphHead">
+            <h3>Demand, marginal revenue &amp; marginal cost</h3>
+            <div class="switchRow">
+              <span>Show Welfare Areas</span>
+              <label class="switch">
+                <input type="checkbox" data-el="welfareToggle" checked>
+                <span class="slider-tog"></span>
+              </label>
+            </div>
+          </div>
+
+          <svg data-el="plot" viewBox="0 0 640 440" role="img" aria-label="Monopoly demand, marginal revenue, and marginal cost curves with the monopoly equilibrium and welfare regions"></svg>
+
+          <div class="legend">
+            <span class="item"><i class="line" style="border-color:#4F46E5"></i>Demand</span>
+            <span class="item"><i class="line" style="border-color:#0F766E"></i>Marginal Revenue</span>
+            <span class="item"><i class="line" style="border-color:#B45309"></i>Marginal Cost</span>
+            <span class="item"><i style="background:#4F46E5;opacity:.30"></i>Consumer Surplus</span>
+            <span class="item"><i style="background:#0F766E;opacity:.32"></i>Producer Surplus / Profit</span>
+            <span class="item"><i style="background:#B91C1C;opacity:.35"></i>Deadweight Loss</span>
+            <span class="item"><i class="dot" style="background:#0F172A"></i>MR = MC intersection</span>
+            <span class="item"><i class="dot" style="background:#4F46E5"></i>Monopoly price on demand</span>
+          </div>
+        </div>
+
+        <div class="card"><h3>Controls</h3>
+          <div class="ctl"><label><span>Demand intercept (a)</span><b data-el="aL">100</b></label>
+            <input type="range" data-el="a" min="40" max="200" value="100" step="5"></div>
+          <div class="ctl"><label><span>Demand slope (b)</span><b data-el="bL">1.0</b></label>
+            <input type="range" data-el="b" min="0.4" max="2.5" value="1.0" step="0.1"></div>
+          <div class="ctl"><label><span>MC intercept (c)</span><b data-el="cL">20</b></label>
+            <input type="range" data-el="c" min="0" max="80" value="20" step="1"></div>
+          <div class="ctl"><label><span>MC slope (d)</span><b data-el="dL">0.30</b></label>
+            <input type="range" data-el="d" min="0" max="2" value="0.3" step="0.05"></div>
+
+          <div class="resetRow">
+            <button type="button" class="btn" data-el="resetBtn">Reset to defaults</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div class="card"><h3>Monopoly Outcome</h3>
+          <div class="outcome-list">
+            <div class="outcome-row"><span class="lab"><i style="background:#4F46E5"></i>Quantity (Qₘ)</span><span class="val" data-el="outQm">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#4F46E5"></i>Price (Pₘ)</span><span class="val" data-el="outPm">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#0F172A"></i>Profit</span><span class="val" data-el="outProfit">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#4F46E5;opacity:.5"></i>Consumer Surplus</span><span class="val" data-el="outCS">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#0F766E;opacity:.6"></i>Producer Surplus</span><span class="val" data-el="outPS">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#B91C1C;opacity:.6"></i>Deadweight Loss</span><span class="val" data-el="outDWL">—</span></div>
+          </div>
+        </div>
+
+        <div class="card"><h3>What's happening</h3>
+          <div class="explainWrap">
+            <div class="explainIcon">i</div>
+            <p id="explainText">Loading…</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Try it — 5 experiments</h3>
+          <div class="expGrid">
+            <button type="button" class="expBtn" data-exp="raiseA">
+              <span class="expTitle">Increase demand intercept</span>
+              <span class="expHint">Shifts demand up. Watch Qₘ and Pₘ both rise.</span>
+            </button>
+            <button type="button" class="expBtn" data-exp="elastic">
+              <span class="expTitle">Make demand more elastic</span>
+              <span class="expHint">Flattens demand. Markup over MC shrinks.</span>
+            </button>
+            <button type="button" class="expBtn" data-exp="steepen">
+              <span class="expTitle">Steepen demand's slope</span>
+              <span class="expHint">Demand becomes less elastic — price rises, DWL grows.</span>
+            </button>
+            <button type="button" class="expBtn" data-exp="raiseMC">
+              <span class="expTitle">Increase marginal cost</span>
+              <span class="expHint">MC shifts up. Qₘ falls, Pₘ rises, profit shrinks.</span>
+            </button>
+            <button type="button" class="expBtn" data-exp="lowerMC">
+              <span class="expTitle">Decrease marginal cost</span>
+              <span class="expHint">MC shifts down. Qₘ rises, Pₘ falls, DWL shrinks.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- MODE 2 — PROFIT & COSTS                                      -->
+  <!-- ============================================================ -->
+  <section class="pane" data-pane="pc" id="pane-pc">
+    <div class="hd"><div class="kicker">Monopoly</div><h1>Firm Behavior</h1></div>
+    <p class="lede">Finding the profit-maximizing quantity is only half the story — whether the monopolist actually <b>earns a profit or suffers a loss</b> depends on how price compares to <b>average total cost (ATC)</b> at that quantity. ATC blends fixed and variable costs into a per-unit figure, while average variable cost (AVC) reflects only the cost of production itself. Because fixed costs are sunk in the short run, they shift ATC up or down but never change the quantity that maximizes profit — they only determine whether producing at that quantity is worth it, or whether the firm is better off shutting down and losing just the fixed cost.</p>
+
+    <div class="tryit">
+      <span class="tryLabel">Try it:</span> Raise fixed costs and watch ATC lift away from AVC — profit shrinks or turns into a loss even though Q<sub>m</sub> never moves. Lower fixed costs instead and see the profit rectangle grow back. Nudge fixed costs until price lands exactly on ATC to find the break-even point, then raise marginal cost until price dips below AVC and the firm shuts down, producing nothing at all. Toggle AVC on and off to see the line that separates "operate at a loss" from "shut down."
+    </div>
+
+    <div class="modeNav">
+      <button type="button" class="modeBtn active" data-mode="mo">Monopoly Equilibrium</button>
+      <button type="button" class="modeBtn" data-mode="pc">Profit &amp; Costs</button>
+    </div>
+
+    <div class="grid">
+      <div class="leftCol">
+        <div class="card">
+          <div class="graphHead">
+            <h3>Demand, marginal cost &amp; average cost curves</h3>
+            <div class="switchRow">
+              <span>Show AVC</span>
+              <label class="switch">
+                <input type="checkbox" data-el="avcToggle" checked>
+                <span class="slider-tog"></span>
+              </label>
+            </div>
+          </div>
+
+          <svg data-el="plotPC" viewBox="0 0 640 440" role="img" aria-label="Monopoly demand, marginal cost, average total cost, and average variable cost curves with the profit or loss rectangle"></svg>
+
+          <div class="legend">
+            <span class="item"><i class="line" style="border-color:#4F46E5"></i>Demand</span>
+            <span class="item"><i class="line" style="border-color:#B45309"></i>Marginal Cost</span>
+            <span class="item"><i class="line" style="border-color:#7C3AED"></i>Average Total Cost (ATC)</span>
+            <span class="item"><i class="dashed" style="border-color:#7C3AED"></i>Average Variable Cost (AVC)</span>
+            <span class="item"><i style="background:#0F766E;opacity:.30"></i>Profit area</span>
+            <span class="item"><i style="background:#B91C1C;opacity:.30"></i>Loss area</span>
+            <span class="item"><i class="dot" style="background:#4F46E5"></i>Price at Qₘ (on demand)</span>
+            <span class="item"><i class="dot" style="background:#7C3AED"></i>ATC at Qₘ</span>
+          </div>
+        </div>
+
+        <div class="card"><h3>Controls</h3>
+          <div class="ctl"><label><span>Demand intercept (a)</span><b data-el="pcaL">100</b></label>
+            <input type="range" data-el="pca" min="40" max="200" value="100" step="5"></div>
+          <div class="ctl"><label><span>Demand slope (b)</span><b data-el="pcbL">1.0</b></label>
+            <input type="range" data-el="pcb" min="0.4" max="2.5" value="1.0" step="0.1"></div>
+          <div class="ctl"><label><span>MC intercept (c)</span><b data-el="pccL">20</b></label>
+            <input type="range" data-el="pcc" min="0" max="80" value="20" step="1"></div>
+          <div class="ctl"><label><span>MC slope (d)</span><b data-el="pcdL">0.30</b></label>
+            <input type="range" data-el="pcd" min="0" max="2" value="0.3" step="0.05"></div>
+          <div class="ctl"><label><span>Fixed cost (FC)</span><b data-el="pcfcL">800</b></label>
+            <input type="range" data-el="pcfc" min="0" max="3000" value="800" step="50"></div>
+
+          <div class="resetRow">
+            <button type="button" class="btn" data-el="pcResetBtn">Reset to defaults</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="rightCol">
+        <div class="card"><h3>Profit &amp; Cost Outcome</h3>
+          <div class="outcome-list">
+            <div class="outcome-row"><span class="lab"><i style="background:#4F46E5"></i>Quantity (Qₘ)</span><span class="val" data-el="pcQm">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#4F46E5"></i>Price (Pₘ)</span><span class="val" data-el="pcPm">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#7C3AED"></i>ATC at Qₘ</span><span class="val" data-el="pcATC">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#7C3AED;opacity:.55"></i>AVC at Qₘ</span><span class="val" data-el="pcAVC">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#0F172A"></i>Total Revenue</span><span class="val" data-el="pcTR">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#94A3B8"></i>Total Cost (incl. FC)</span><span class="val" data-el="pcTC">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#0F766E"></i>Profit / Loss</span><span class="val" data-el="pcProfit">—</span></div>
+            <div class="outcome-row"><span class="lab"><i style="background:#B45309"></i>Decision</span><span class="val" data-el="pcStatus">—</span></div>
+          </div>
+        </div>
+
+        <div class="card"><h3>What's happening</h3>
+          <div class="explainWrap">
+            <div class="explainIcon">i</div>
+            <p id="explainTextPC">Loading…</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Try it — 5 experiments</h3>
+          <div class="expGrid">
+            <button type="button" class="expBtn" data-pcexp="raiseFC">
+              <span class="expTitle">Increase fixed costs</span>
+              <span class="expHint">ATC rises. Watch profit shrink or turn to loss — Qₘ doesn't move.</span>
+            </button>
+            <button type="button" class="expBtn" data-pcexp="lowerFC">
+              <span class="expTitle">Decrease fixed costs</span>
+              <span class="expHint">ATC falls closer to AVC. Profit improves at the same Qₘ.</span>
+            </button>
+            <button type="button" class="expBtn" data-pcexp="breakEven">
+              <span class="expTitle">Find the break-even FC</span>
+              <span class="expHint">Sets fixed costs so profit is exactly zero at the current Qₘ.</span>
+            </button>
+            <button type="button" class="expBtn" data-pcexp="shutdown">
+              <span class="expTitle">Trigger a shutdown</span>
+              <span class="expHint">Demand can't even cover marginal cost — the firm produces nothing.</span>
+            </button>
+            <button type="button" class="expBtn" data-pcexp="profitable">
+              <span class="expTitle">Return to a profitable market</span>
+              <span class="expHint">Resets demand and cost to a comfortably profitable scenario.</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function mk(svg){return (t,at)=>{let e=document.createElementNS(NS,t);for(let k in at)e.setAttribute(k,at[k]);svg.appendChild(e);return e;};}
+
+/* ================================================================ */
+/* MODE SWITCHER (buttons are duplicated in both panes now — sync   */
+/* every button whose data-mode matches, not just the clicked one)  */
+/* ================================================================ */
+document.querySelectorAll('.modeBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const mode = btn.getAttribute('data-mode');
+    document.querySelectorAll('.modeBtn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-mode')===mode));
+    document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.getAttribute('data-pane')===mode));
+  });
+});
+
+/* ================================================================ */
+/* MODE 1 — MONOPOLY (D + MR + MC) — UNCHANGED LOGIC                */
+/* ================================================================ */
+(function(){
+  const root=document.getElementById('pane-mo'); const $=s=>root.querySelector('[data-el="'+s+'"]');
+  const svg=$('plot'), el=mk(svg);
+
+  const L=56,R=600,T=22,B=384;
+
+  const DEFAULTS = {a:100, b:1.0, c:20, d:0.30};
+  let a=DEFAULTS.a, b=DEFAULTS.b, c=DEFAULTS.c, d=DEFAULTS.d;
+  let welfareOn = true;
+
+  function demandP(Q){ return a - b*Q; }
+  function mrP(Q){ return a - 2*b*Q; }
+  function mcP(Q){ return c + d*Q; }
+
+  function monopolyEquilibrium(){
+    const Qm = Math.max(0, (a - c) / (2*b + d));
+    const Pm = demandP(Qm);
+    return {Qm, Pm, MCm: mcP(Qm)};
+  }
+  function efficientPoint(){
+    const Qe = Math.max(0, (a - c) / (b + d));
+    const Pe = mcP(Qe);
+    return {Qe, Pe};
+  }
+
+  const aInp=$('a'), bInp=$('b'), cInp=$('c'), dInp=$('d');
+
+  const QMAX = 260;
+  const PMAX = 220;
+  const MC_HEADROOM = 0.95;
+  const PX = q => L + (q/QMAX)*(R-L);
+  const PY = p => B - (p/PMAX)*(B-T);
+  const clampP = p => Math.max(0, Math.min(PMAX, p));
+  const PYc = p => PY(clampP(p));
+
+  (function drawGrid(){
+    const qStep=40, pStep=40;
+    for(let q=qStep; q<QMAX; q+=qStep){
+      el('line',{x1:PX(q),y1:T,x2:PX(q),y2:B,stroke:'#EEF1F6','stroke-width':1});
+    }
+    for(let p=pStep; p<PMAX; p+=pStep){
+      el('line',{x1:L,y1:PY(p),x2:R,y2:PY(p),stroke:'#EEF1F6','stroke-width':1});
+    }
+  })();
+
+  el('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+  el('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+  el('path',{d:`M${R} ${B} l-9 -5 l0 10 z`,fill:'#0F172A'});
+  el('path',{d:`M${L} ${T} l-5 9 l10 0 z`,fill:'#0F172A'});
+
+  (function drawTicks(){
+    const qStep=40, pStep=40;
+    for(let q=qStep; q<=QMAX; q+=qStep){
+      el('line',{x1:PX(q),y1:B,x2:PX(q),y2:B+6,stroke:'#0F172A','stroke-width':1.4});
+    }
+    for(let p=pStep; p<=PMAX; p+=pStep){
+      el('line',{x1:L-6,y1:PY(p),x2:L,y2:PY(p),stroke:'#0F172A','stroke-width':1.4});
+    }
+  })();
+
+  const welfareGroup = el('g',{class:'welfareGroup'});
+  const csPoly  = document.createElementNS(NS,'path'); csPoly.setAttribute('fill','#4F46E5'); csPoly.setAttribute('fill-opacity','0.16'); csPoly.setAttribute('stroke','none');
+  const psPoly  = document.createElementNS(NS,'path'); psPoly.setAttribute('fill','#0F766E'); psPoly.setAttribute('fill-opacity','0.20'); psPoly.setAttribute('stroke','none');
+  const dwlPoly = document.createElementNS(NS,'path'); dwlPoly.setAttribute('fill','#B91C1C'); dwlPoly.setAttribute('fill-opacity','0.22'); dwlPoly.setAttribute('stroke','none');
+  welfareGroup.appendChild(csPoly); welfareGroup.appendChild(psPoly); welfareGroup.appendChild(dwlPoly);
+  svg.appendChild(welfareGroup);
+
+  const demandLine = el('line',{stroke:'#4F46E5','stroke-width':3,'stroke-linecap':'round'});
+  const mrLine     = el('line',{stroke:'#0F766E','stroke-width':3,'stroke-linecap':'round'});
+  const mcLine     = el('line',{stroke:'#B45309','stroke-width':3,'stroke-linecap':'round'});
+
+  const monoVGuide = el('line',{stroke:'#94A3B8','stroke-width':1.5,'stroke-dasharray':'5 4'});
+  const monoHGuide = el('line',{stroke:'#94A3B8','stroke-width':1.5,'stroke-dasharray':'5 4'});
+
+  const mcHalo    = el('circle',{r:10,fill:'#0F172A','fill-opacity':0.14});
+  const monoMCDot = el('circle',{r:5,fill:'#0F172A',stroke:'#fff','stroke-width':1.8});
+
+  const monoHalo = el('circle',{r:11,fill:'#4F46E5','fill-opacity':0.18});
+  const monoDot  = el('circle',{r:6.5,fill:'#4F46E5',stroke:'#fff','stroke-width':2.5});
+
+  function polyPath(points){
+    return 'M' + points.map(([q,p]) => `${PX(q)} ${PYc(p)}`).join(' L ') + ' Z';
+  }
+
+  const fmt$ = v => '$' + v.toFixed(2);
+  const fmtQ = v => v.toFixed(2);
+
+  function updateOutcomePanel(Qm,Pm,profit,CS,PS,DWL){
+    $('outQm').textContent = Qm>0 ? fmtQ(Qm) : '—';
+    $('outPm').textContent = Qm>0 ? fmt$(Pm) : '—';
+    $('outProfit').textContent = Qm>0 ? fmt$(profit) : '—';
+    $('outCS').textContent = Qm>0 ? fmt$(CS) : '—';
+    $('outPS').textContent = Qm>0 ? fmt$(PS) : '—';
+    $('outDWL').textContent = Qm>0 ? fmt$(DWL) : '—';
+  }
+
+  function updateExplanation(Qm,Pm,profit,CS,DWL,hasDWL){
+    const txt = document.getElementById('explainText');
+    if(Qm<=0){
+      txt.innerHTML = `At these settings, marginal cost is too high relative to demand — there is no output level where the monopolist can profitably produce. Try lowering MC or raising the demand intercept.`;
+      return;
+    }
+    let s = `The monopolist chooses <b>Q = ${Qm.toFixed(2)}</b>, the quantity where marginal revenue equals marginal cost. Reading up to the demand curve at that quantity gives a price of <b>$${Pm.toFixed(2)}</b> — the most consumers will pay for that many units. This yields a profit of <b>$${profit.toFixed(2)}</b>.`;
+    if(hasDWL && DWL>0.01){
+      s += ` Because the monopolist restricts output below the level where price would equal marginal cost, <b>$${DWL.toFixed(2)}</b> in potential surplus is lost as deadweight loss.`;
+    } else {
+      s += ` At this scale, the efficient and monopoly quantities are essentially the same, so little surplus is lost.`;
+    }
+    txt.innerHTML = s;
+  }
+
+  function updateAll(){
+    const {Qm,Pm,MCm} = monopolyEquilibrium();
+    const {Qe,Pe} = efficientPoint();
+
+    let CS=0, PS=0, DWL=0, profit=0;
+    if(Qm>0){
+      CS = 0.5*(a-Pm)*Qm;
+      PS = (Pm-c)*Qm - 0.5*d*Qm*Qm;
+      profit = PS;
+      if(Qe>Qm) DWL = 0.5*(Pm-MCm)*(Qe-Qm);
+    }
+    updateOutcomePanel(Qm,Pm,profit,CS,PS,DWL);
+    updateExplanation(Qm,Pm,profit,CS,DWL,Qe>Qm);
+
+    if(Qm>0){
+      csPoly.setAttribute('d', polyPath([[0,a],[0,Pm],[Qm,Pm]]));
+      psPoly.setAttribute('d', polyPath([[0,c],[0,Pm],[Qm,Pm],[Qm,MCm]]));
+    } else {
+      csPoly.setAttribute('d',''); psPoly.setAttribute('d','');
+    }
+    if(Qe>Qm && Qm>0){
+      dwlPoly.setAttribute('d', polyPath([[Qm,Pm],[Qm,MCm],[Qe,Pe]]));
+    } else {
+      dwlPoly.setAttribute('d','');
+    }
+    welfareGroup.style.opacity = welfareOn ? '1' : '0';
+
+    const Qd = a/b;
+    demandLine.setAttribute('x1',PX(0)); demandLine.setAttribute('y1',PY(a));
+    demandLine.setAttribute('x2',PX(Qd)); demandLine.setAttribute('y2',PY(demandP(Qd)));
+
+    const Qmr = a/(2*b);
+    mrLine.setAttribute('x1',PX(0)); mrLine.setAttribute('y1',PY(a));
+    mrLine.setAttribute('x2',PX(Qmr)); mrLine.setAttribute('y2',PY(mrP(Qmr)));
+
+    let QmcTop = QMAX;
+    if(d>0){
+      const qAtCap = (PMAX*MC_HEADROOM - c) / d;
+      QmcTop = Math.max(0, Math.min(QMAX, qAtCap));
+    }
+    mcLine.setAttribute('x1',PX(0)); mcLine.setAttribute('y1',PY(mcP(0)));
+    mcLine.setAttribute('x2',PX(QmcTop)); mcLine.setAttribute('y2',PY(mcP(QmcTop)));
+
+    if(Qm>0){
+      const px=PX(Qm), pyPm=PY(Pm), pyMC=PY(MCm);
+
+      monoVGuide.setAttribute('x1',px); monoVGuide.setAttribute('y1',B);
+      monoVGuide.setAttribute('x2',px); monoVGuide.setAttribute('y2',pyPm);
+      monoHGuide.setAttribute('x1',px); monoHGuide.setAttribute('y1',pyPm);
+      monoHGuide.setAttribute('x2',L);  monoHGuide.setAttribute('y2',pyPm);
+
+      mcHalo.setAttribute('cx',px);    mcHalo.setAttribute('cy',pyMC);
+      monoMCDot.setAttribute('cx',px); monoMCDot.setAttribute('cy',pyMC);
+
+      monoHalo.setAttribute('cx',px); monoHalo.setAttribute('cy',pyPm);
+      monoDot.setAttribute('cx',px);  monoDot.setAttribute('cy',pyPm);
+
+      [monoVGuide,monoHGuide,mcHalo,monoMCDot,monoHalo,monoDot,demandLine,mrLine,mcLine]
+        .forEach(node=>node.style.display='');
+    } else {
+      [monoVGuide,monoHGuide,mcHalo,monoMCDot,monoHalo,monoDot]
+        .forEach(node=>node.style.display='none');
+    }
+  }
+
+  function syncSliderUI(){
+    aInp.value=a; $('aL').textContent=a;
+    bInp.value=b; $('bL').textContent=b.toFixed(1);
+    cInp.value=c; $('cL').textContent=c;
+    dInp.value=d; $('dL').textContent=d.toFixed(2);
+  }
+
+  function bind(name,set,fmtFn){
+    const inp=$(name);
+    inp.addEventListener('input', e=>{
+      const v=+e.target.value;
+      set(v);
+      $(name+'L').textContent = fmtFn ? fmtFn(v) : v;
+      updateAll();
+    });
+  }
+
+  bind('a', v=>a=v);
+  bind('b', v=>b=v, v=>v.toFixed(1));
+  bind('c', v=>c=v);
+  bind('d', v=>d=v, v=>v.toFixed(2));
+
+  $('resetBtn').addEventListener('click', ()=>{
+    animateTo(DEFAULTS.a, DEFAULTS.b, DEFAULTS.c, DEFAULTS.d);
+  });
+
+  $('welfareToggle').addEventListener('change', e=>{
+    welfareOn = e.target.checked;
+    updateAll();
+  });
+
+  let rafId=null;
+  function animateTo(ta,tb,tc,td,duration=550){
+    if(rafId) cancelAnimationFrame(rafId);
+    const sa=a, sb=b, sc=c, sd=d;
+    const t0=performance.now();
+    function ease(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+    function step(now){
+      const t=Math.min(1,(now-t0)/duration);
+      const k=ease(t);
+      a = sa + (ta-sa)*k;
+      b = sb + (tb-sb)*k;
+      c = sc + (tc-sc)*k;
+      d = sd + (td-sd)*k;
+      syncSliderUI();
+      updateAll();
+      if(t<1){ rafId=requestAnimationFrame(step); }
+      else { a=ta;b=tb;c=tc;d=td; syncSliderUI(); updateAll(); rafId=null; }
+    }
+    rafId=requestAnimationFrame(step);
+  }
+
+  const experiments = {
+    raiseA:   ()=>animateTo(Math.min(200, a+40), b, c, d),
+    elastic:  ()=>animateTo(a, Math.max(0.4, 0.5), c, d),
+    steepen:  ()=>animateTo(a, Math.min(2.5, 1.9), c, d),
+    raiseMC:  ()=>animateTo(a, b, Math.min(80, c+30), d),
+    lowerMC:  ()=>animateTo(a, b, Math.max(0, c-15), d),
+  };
+
+  root.querySelectorAll('.expBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.getAttribute('data-exp');
+      if(experiments[key]) experiments[key]();
+    });
+  });
+
+  updateAll();
+})();
+
+/* ================================================================ */
+/* MODE 2 — PROFIT & COSTS: D + MC + ATC + AVC, profit/loss         */
+/* ================================================================ */
+(function(){
+  const root=document.getElementById('pane-pc'); const $=s=>root.querySelector('[data-el="'+s+'"]');
+  const svg=$('plotPC'), el=mk(svg);
+
+  const L=56,R=600,T=22,B=384;
+
+  const DEFAULTS = {a:100, b:1.0, c:20, d:0.30, fc:800};
+  let a=DEFAULTS.a, b=DEFAULTS.b, c=DEFAULTS.c, d=DEFAULTS.d, fc=DEFAULTS.fc;
+  let avcOn = true;
+
+  function demandP(Q){ return a - b*Q; }
+  function mrP(Q){ return a - 2*b*Q; }
+  function mcP(Q){ return c + d*Q; }
+  function avcP(Q){ return c + (d/2)*Q; }
+  function atcP(Q){ return Q>0 ? (fc/Q) + c + (d/2)*Q : Infinity; }
+  function tcP(Q){ return fc + c*Q + (d/2)*Q*Q; }
+
+  function monopolyEquilibrium(){
+    const Qm = Math.max(0, (a - c) / (2*b + d));
+    const Pm = demandP(Qm);
+    return {Qm, Pm};
+  }
+
+  const aInp=$('pca'), bInp=$('pcb'), cInp=$('pcc'), dInp=$('pcd'), fcInp=$('pcfc');
+
+  const QMAX = 260;
+  const PMAX = 220;
+  const HEADROOM = 0.95;
+  const PX = q => L + (q/QMAX)*(R-L);
+  const PY = p => B - (p/PMAX)*(B-T);
+  const clampP = p => Math.max(0, Math.min(PMAX, p));
+  const PYc = p => PY(clampP(p));
+
+  (function drawGrid(){
+    const qStep=40, pStep=40;
+    for(let q=qStep; q<QMAX; q+=qStep){
+      el('line',{x1:PX(q),y1:T,x2:PX(q),y2:B,stroke:'#EEF1F6','stroke-width':1});
+    }
+    for(let p=pStep; p<PMAX; p+=pStep){
+      el('line',{x1:L,y1:PY(p),x2:R,y2:PY(p),stroke:'#EEF1F6','stroke-width':1});
+    }
+  })();
+
+  el('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+  el('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+  el('path',{d:`M${R} ${B} l-9 -5 l0 10 z`,fill:'#0F172A'});
+  el('path',{d:`M${L} ${T} l-5 9 l10 0 z`,fill:'#0F172A'});
+
+  (function drawTicks(){
+    const qStep=40, pStep=40;
+    for(let q=qStep; q<=QMAX; q+=qStep){
+      el('line',{x1:PX(q),y1:B,x2:PX(q),y2:B+6,stroke:'#0F172A','stroke-width':1.4});
+    }
+    for(let p=pStep; p<=PMAX; p+=pStep){
+      el('line',{x1:L-6,y1:PY(p),x2:L,y2:PY(p),stroke:'#0F172A','stroke-width':1.4});
+    }
+  })();
+
+  const rectGroup = el('g',{class:'rectGroup'});
+  const rectPoly = document.createElementNS(NS,'path'); rectPoly.setAttribute('stroke','none');
+  rectGroup.appendChild(rectPoly);
+  svg.appendChild(rectGroup);
+
+  const demandLine = el('line',{stroke:'#4F46E5','stroke-width':3,'stroke-linecap':'round'});
+  const mcPath      = el('path',{fill:'none',stroke:'#B45309','stroke-width':3,'stroke-linecap':'round'});
+  const atcPath     = el('path',{fill:'none',stroke:'#7C3AED','stroke-width':3,'stroke-linecap':'round'});
+  const avcPath     = el('path',{fill:'none',stroke:'#7C3AED','stroke-width':2.5,'stroke-linecap':'round','stroke-dasharray':'7 6'});
+
+  const vGuide = el('line',{stroke:'#94A3B8','stroke-width':1.5,'stroke-dasharray':'5 4'});
+  const hGuideP = el('line',{stroke:'#94A3B8','stroke-width':1.5,'stroke-dasharray':'5 4'});
+  const hGuideATC = el('line',{stroke:'#94A3B8','stroke-width':1.5,'stroke-dasharray':'5 4'});
+
+  const priceHalo = el('circle',{r:11,fill:'#4F46E5','fill-opacity':0.18});
+  const priceDot  = el('circle',{r:6.5,fill:'#4F46E5',stroke:'#fff','stroke-width':2.5});
+  const atcHalo   = el('circle',{r:10,fill:'#7C3AED','fill-opacity':0.18});
+  const atcDot    = el('circle',{r:6,fill:'#7C3AED',stroke:'#fff','stroke-width':2.3});
+
+  function polyPath(points){
+    return 'M' + points.map(([q,p]) => `${PX(q)} ${PYc(p)}`).join(' L ') + ' Z';
+  }
+
+  function buildCurvePath(fn, qStart, qEnd, steps){
+    let d='', started=false;
+    for(let i=0;i<=steps;i++){
+      const q = qStart + (qEnd-qStart)*i/steps;
+      const p = fn(q);
+      const visible = isFinite(p) && p>=0 && p<=PMAX;
+      if(visible){
+        const x=PX(q), y=PY(p);
+        d += started ? ` L${x} ${y}` : `M${x} ${y}`;
+        started=true;
+      } else {
+        started=false;
+      }
+    }
+    return d;
+  }
+
+  const fmt$ = v => '$' + v.toFixed(2);
+  const fmt$0 = v => '$' + v.toFixed(0);
+  const fmtQ = v => v.toFixed(2);
+
+  function updateOutcomePanel(state){
+    const {Qm,Pm,ATC,AVC,TR,TC,profit,status} = state;
+    $('pcQm').textContent = Qm>0 ? fmtQ(Qm) : '0.00';
+    $('pcPm').textContent = Qm>0 ? fmt$(Pm) : '—';
+    $('pcATC').textContent = Qm>0 ? fmt$(ATC) : '—';
+    $('pcAVC').textContent = Qm>0 ? fmt$(AVC) : '—';
+    $('pcTR').textContent = Qm>0 ? fmt$0(TR) : '$0';
+    $('pcTC').textContent = Qm>0 ? fmt$0(TC) : fmt$0(fc);
+    $('pcProfit').textContent = fmt$0(profit);
+    $('pcStatus').textContent = status;
+  }
+
+  function updateExplanation(state){
+    const {Qm,Pm,ATC,AVC,profit,status} = state;
+    const txt = document.getElementById('explainTextPC');
+    if(Qm<=0){
+      txt.innerHTML = `Demand doesn't reach as high as marginal cost, so there's no quantity the monopolist could sell at a price that even covers producing one more unit. The firm <b>shuts down</b>, produces zero, and loses only its fixed cost of <b>$${fc.toFixed(0)}</b>.`;
+      return;
+    }
+    let s = `At Q<sub>m</sub> = ${Qm.toFixed(2)}, price is <b>$${Pm.toFixed(2)}</b> while average total cost is <b>$${ATC.toFixed(2)}</b>. `;
+    if(profit>0.5){
+      s += `Since price exceeds ATC, the firm earns an economic <b>profit of $${profit.toFixed(0)}</b> — shown as the teal rectangle between the demand curve and the ATC curve.`;
+    } else if(profit < -0.5 && Pm >= AVC - 1e-6){
+      s += `Since price is below ATC but still above AVC ($${AVC.toFixed(2)}), the firm is operating at a <b>loss of $${Math.abs(profit).toFixed(0)}</b> — but it keeps producing in the short run because revenue covers all variable costs and part of the fixed cost.`;
+    } else if(Math.abs(profit) <= 0.5){
+      s += `Price just equals ATC, so the firm is at the <b>break-even point</b> — zero economic profit, covering every dollar of cost including the fixed cost.`;
+    } else {
+      s += `Price has fallen below AVC ($${AVC.toFixed(2)}), so producing would lose money on every unit sold beyond what's unavoidable. The firm is better off shutting down and losing only its fixed cost.`;
+    }
+    txt.innerHTML = s;
+  }
+
+  function updateAll(){
+    const {Qm,Pm} = monopolyEquilibrium();
+    let ATC=0, AVC=0, TR=0, TC=fc, profit=-fc, status='Shutdown';
+
+    if(Qm>0){
+      ATC = atcP(Qm);
+      AVC = avcP(Qm);
+      TR = Pm*Qm;
+      TC = tcP(Qm);
+      profit = TR - TC;
+
+      if(Pm < AVC - 1e-6){
+        status = 'Shutdown';
+      } else if(profit > 0.5){
+        status = 'Profit';
+      } else if(profit < -0.5){
+        status = 'Operating at a loss';
+      } else {
+        status = 'Break-even';
+      }
+    }
+
+    updateOutcomePanel({Qm,Pm,ATC,AVC,TR,TC,profit,status});
+    updateExplanation({Qm,Pm,ATC,AVC,profit,status});
+
+    if(Qm>0 && status!=='Shutdown'){
+      rectPoly.setAttribute('d', polyPath([[0,Pm],[Qm,Pm],[Qm,ATC],[0,ATC]]));
+      rectPoly.setAttribute('fill', profit>=0 ? '#0F766E' : '#B91C1C');
+      rectPoly.setAttribute('fill-opacity', profit>=0 ? '0.22' : '0.20');
+      rectGroup.style.opacity='1';
+    } else {
+      rectPoly.setAttribute('d','');
+      rectGroup.style.opacity='0';
+    }
+
+    const Qd = a/b;
+    demandLine.setAttribute('x1',PX(0)); demandLine.setAttribute('y1',PY(a));
+    demandLine.setAttribute('x2',PX(Qd)); demandLine.setAttribute('y2',PY(demandP(Qd)));
+
+    let QmcTop = QMAX;
+    if(d>0){
+      const qAtCap = (PMAX*HEADROOM - c) / d;
+      QmcTop = Math.max(0, Math.min(QMAX, qAtCap));
+    }
+    mcPath.setAttribute('d', `M${PX(0)} ${PY(mcP(0))} L${PX(QmcTop)} ${PY(mcP(QmcTop))}`);
+
+    const qEps = QMAX*0.01;
+    atcPath.setAttribute('d', buildCurvePath(atcP, qEps, QMAX, 220));
+    avcPath.setAttribute('d', avcOn ? buildCurvePath(avcP, 0, QMAX, 160) : '');
+    avcPath.style.display = avcOn ? '' : 'none';
+
+    if(Qm>0 && status!=='Shutdown'){
+      const px=PX(Qm), pyP=PY(Pm), pyATC=PY(Math.min(ATC,PMAX));
+
+      vGuide.setAttribute('x1',px); vGuide.setAttribute('y1',B);
+      vGuide.setAttribute('x2',px); vGuide.setAttribute('y2',Math.min(pyP,pyATC));
+
+      hGuideP.setAttribute('x1',px); hGuideP.setAttribute('y1',pyP);
+      hGuideP.setAttribute('x2',L);  hGuideP.setAttribute('y2',pyP);
+
+      hGuideATC.setAttribute('x1',px); hGuideATC.setAttribute('y1',pyATC);
+      hGuideATC.setAttribute('x2',L);  hGuideATC.setAttribute('y2',pyATC);
+
+      priceHalo.setAttribute('cx',px); priceHalo.setAttribute('cy',pyP);
+      priceDot.setAttribute('cx',px);  priceDot.setAttribute('cy',pyP);
+      atcHalo.setAttribute('cx',px);   atcHalo.setAttribute('cy',pyATC);
+      atcDot.setAttribute('cx',px);    atcDot.setAttribute('cy',pyATC);
+
+      [vGuide,hGuideP,hGuideATC,priceHalo,priceDot,atcHalo,atcDot].forEach(n=>n.style.display='');
+    } else {
+      [vGuide,hGuideP,hGuideATC,priceHalo,priceDot,atcHalo,atcDot].forEach(n=>n.style.display='none');
+    }
+  }
+
+  function syncSliderUI(){
+    aInp.value=a; $('pcaL').textContent=Math.round(a);
+    bInp.value=b; $('pcbL').textContent=b.toFixed(1);
+    cInp.value=c; $('pccL').textContent=Math.round(c);
+    dInp.value=d; $('pcdL').textContent=d.toFixed(2);
+    fcInp.value=fc; $('pcfcL').textContent=Math.round(fc);
+  }
+
+  function bind(name,label,set,fmtFn){
+    const inp=$(name);
+    inp.addEventListener('input', e=>{
+      const v=+e.target.value;
+      set(v);
+      $(label).textContent = fmtFn ? fmtFn(v) : Math.round(v);
+      updateAll();
+    });
+  }
+
+  bind('pca','pcaL', v=>a=v);
+  bind('pcb','pcbL', v=>b=v, v=>v.toFixed(1));
+  bind('pcc','pccL', v=>c=v);
+  bind('pcd','pcdL', v=>d=v, v=>v.toFixed(2));
+  bind('pcfc','pcfcL', v=>fc=v);
+
+  $('avcToggle').addEventListener('change', e=>{
+    avcOn = e.target.checked;
+    updateAll();
+  });
+
+  let rafId=null;
+  function animateTo(ta,tb,tc,td,tfc,duration=550){
+    if(rafId) cancelAnimationFrame(rafId);
+    const sa=a, sb=b, sc=c, sd=d, sfc=fc;
+    const t0=performance.now();
+    function ease(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+    function step(now){
+      const t=Math.min(1,(now-t0)/duration);
+      const k=ease(t);
+      a = sa+(ta-sa)*k; b = sb+(tb-sb)*k; c = sc+(tc-sc)*k; d = sd+(td-sd)*k; fc = sfc+(tfc-sfc)*k;
+      syncSliderUI();
+      updateAll();
+      if(t<1){ rafId=requestAnimationFrame(step); }
+      else { a=ta;b=tb;c=tc;d=td;fc=tfc; syncSliderUI(); updateAll(); rafId=null; }
+    }
+    rafId=requestAnimationFrame(step);
+  }
+
+  $('pcResetBtn').addEventListener('click', ()=>{
+    animateTo(DEFAULTS.a, DEFAULTS.b, DEFAULTS.c, DEFAULTS.d, DEFAULTS.fc);
+  });
+
+  function currentBreakEvenFC(){
+    const {Qm,Pm} = monopolyEquilibrium();
+    if(Qm<=0) return fc;
+    const AVC = avcP(Qm);
+    return Math.max(0, (Pm - AVC) * Qm);
+  }
+
+  const experiments = {
+    raiseFC:   ()=>animateTo(a,b,c,d, Math.min(3000, fc+800)),
+    lowerFC:   ()=>animateTo(a,b,c,d, Math.max(0, fc-400)),
+    breakEven: ()=>animateTo(a,b,c,d, Math.max(0, Math.min(3000, currentBreakEvenFC()))),
+    shutdown:  ()=>animateTo(45, 1.0, 60, 0.3, fc),
+    profitable:()=>animateTo(DEFAULTS.a, DEFAULTS.b, DEFAULTS.c, DEFAULTS.d, DEFAULTS.fc),
+  };
+
+  root.querySelectorAll('.expBtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.getAttribute('data-pcexp');
+      if(experiments[key]) experiments[key]();
+    });
+  });
+
+  updateAll();
+})();
+</script>
+</body>
+</html>
