@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cost Curves — Interactive Microeconomics</title>
+<style>
+  :root{
+    --acc:#4F46E5; --acc-d:#3730A3; --acc-t:#EEF2FF;
+    --pos:#0D9488; --neg:#DC2626; --gold:#B45309;
+    --ink:#0F172A; --body:#334155; --slate:#64748B; --mut:#94A3B8;
+    --paper:#F6F7FB; --card:#FFFFFF; --line:#E5E9F0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:22px 18px 40px;}
+  .title{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd{border-left:5px solid var(--acc);padding:1px 0 1px 15px;margin:14px 0 4px;}
+  .kicker{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);font-weight:800;}
+  .hd h1{font-size:21px;line-height:1.2;margin-top:2px;font-weight:800;}
+  .lede{font-size:14px;color:var(--body);margin:9px 0 2px;max-width:730px;}
+
+  /* --- Try it callout (purple) --- */
+  .tryit{
+    margin:14px 0 2px;
+    padding:13px 16px;
+    border-radius:11px;
+    background:var(--acc-t);
+    border-left:4px solid var(--acc);
+    font-size:13.5px;
+    color:var(--body);
+    max-width:850px;
+  }
+  .tryit b{color:var(--acc-d);}
+
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:14px;}
+  @media(max-width:740px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--card);border-radius:14px;padding:16px 18px;border:1px solid var(--line);}
+  .card h3{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:#7A88A0;margin-bottom:10px;font-weight:800;}
+  svg{width:100%;height:auto;display:block;}
+  .ctl{margin:9px 0;}
+  .ctl label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:5px;}
+  .ctl label b{color:var(--acc);font-variant-numeric:tabular-nums;}
+  input[type=range]{width:100%;-webkit-appearance:none;height:7px;border-radius:7px;background:var(--line);outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:23px;height:23px;border-radius:50%;
+    background:#fff;border:4px solid var(--acc);cursor:pointer;box-shadow:0 2px 7px rgba(15,23,42,.22);}
+  input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:#fff;border:4px solid var(--acc);cursor:pointer;}
+  .stats{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:60px;background:var(--paper);border-radius:10px;padding:9px 4px;text-align:center;}
+  .stat .big{font-size:18px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;}
+  .stat .lab{font-size:9px;color:var(--slate);text-transform:uppercase;letter-spacing:.02em;margin-top:3px;font-weight:700;}
+  .note{margin-top:10px;padding:8px 12px;border-radius:10px;background:var(--acc-t);font-size:12px;text-align:center;font-weight:700;color:var(--acc-d);font-variant-numeric:tabular-nums;}
+  .callout{margin-top:10px;padding:11px 13px;border-radius:10px;background:var(--paper);font-size:12.5px;color:var(--body);min-height:60px;}
+  .callout b{color:var(--ink);}
+  .presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;}
+  .preset{border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:6px 11px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--ink);transition:.15s;}
+  .preset:hover{border-color:var(--acc);background:var(--acc);color:#fff;}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--slate);margin-top:6px;font-weight:700;}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
+  .legend span{transition:opacity .15s;}
+  .modeToggle{display:flex;gap:6px;margin-bottom:12px;}
+  .modeBtn{flex:1;text-align:center;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);
+    background:#fff;font-size:12px;font-weight:800;cursor:pointer;color:var(--body);transition:.15s;}
+  .modeBtn:hover{border-color:var(--acc);}
+  .modeBtn.active{background:var(--acc);color:#fff;border-color:var(--acc);}
+  #pane-cv.mode-supply .legend span[data-item="atc"],
+  #pane-cv.mode-supply .legend span[data-item="avc"],
+  #pane-cv.mode-supply .legend span[data-item="afc"]{opacity:.32;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title">Intermediate Microeconomics · Interactive Toolkit</div>
+
+  <section id="pane-cv">
+    <div class="hd"><div class="kicker">PROFIT MAXIMIZATION AND SUPPLY
+</div><h1>Cost Curves &amp; the Firm's Supply Decision</h1></div>
+    <p class="lede">From a firm's cost function come four curves: <b>MC, ATC, AVC,</b> and <b>AFC</b>. Marginal cost cuts through the minimum of both average curves. Set the price to see where the firm produces — and when it shuts down.</p>
+
+    <div class="tryit">
+      <b>Try it:</b> Slide the price down until it crosses the AVC minimum — the firm shuts down and q* drops to zero. Raise it to the ATC minimum for the break-even point, and further still for a profit. Use the presets to jump straight to each scenario, or switch to <b>Firm Supply</b> to watch these same points trace out the supply curve.
+    </div>
+
+    <div class="grid">
+      <div class="card"><h3 data-el="cardTitle">Per-unit cost &amp; price</h3>
+        <div class="modeToggle">
+          <button class="modeBtn active" data-mode="cost">Cost Curves</button>
+          <button class="modeBtn" data-mode="supply">Firm Supply</button>
+        </div>
+        <svg data-el="plot" viewBox="0 0 520 380" role="img" aria-label="MC ATC AVC AFC cost curves with price line"></svg>
+        <div class="legend">
+          <span data-item="mc"><i style="background:#4F46E5"></i>MC</span>
+          <span data-item="atc"><i style="background:#0F172A"></i>ATC</span>
+          <span data-item="avc"><i style="background:#0F766E"></i>AVC</span>
+          <span data-item="afc"><i style="background:#94A3B8"></i>AFC</span>
+          <span data-item="price"><i style="background:#B45309"></i>Price</span>
+        </div>
+      </div>
+      <div class="card"><h3>Controls</h3>
+        <div class="ctl"><label><span>Fixed cost (F)</span><b data-el="fL">100</b></label><input type="range" data-el="f" min="40" max="180" value="100" step="10"></div>
+        <div class="ctl"><label><span>Market price (P)</span><b data-el="pL">60</b></label><input type="range" data-el="p" min="10" max="110" value="60" step="1"></div>
+        <div class="stats">
+          <div class="stat"><div class="big" data-el="qv" style="color:var(--acc)">–</div><div class="lab">q* (P=MC)</div></div>
+          <div class="stat"><div class="big" data-el="atcv" style="color:var(--ink)">–</div><div class="lab">ATC at q*</div></div>
+          <div class="stat"><div class="big" data-el="prof" style="color:var(--pos)">–</div><div class="lab">Profit</div></div>
+        </div>
+        <div class="note" data-el="status">–</div>
+        <div class="callout" data-el="callout"></div>
+        <div class="presets" data-el="presets"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function mk(svg){return (t,at)=>{let e=document.createElementNS(NS,t);for(let k in at)e.setAttribute(k,at[k]);svg.appendChild(e);return e;};}
+
+function smoothPath(pts){
+  if(pts.length<2) return '';
+  if(pts.length===2) return `M${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)} L${pts[1][0].toFixed(2)} ${pts[1][1].toFixed(2)}`;
+  let d = `M${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)} `;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    const c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
+    const c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+=`C${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${p2[0].toFixed(2)} ${p2[1].toFixed(2)} `;
+  }
+  return d;
+}
+const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+
+(function(){
+  const root=document.getElementById('pane-cv'); const $=s=>root.querySelector('[data-el="'+s+'"]');
+  const svg=$('plot'), el=mk(svg);
+  const L=54,R=506,T=18,B=330, QMAX=12, YMAX=120, QMIN=0.8;
+  let mode='cost';
+
+  // "Live" values used by every drawing/curve function — these are the
+  // ones that get eased frame-by-frame toward the slider targets, which
+  // is what makes the curves/q*/guide-lines glide instead of jumping.
+  let F=100, P=60;
+  // Targets set instantly by sliders/presets; F,P chase these each frame.
+  let targetF=100, targetP=60;
+  let rafId=null;
+
+  const PX=q=>L+(q/QMAX)*(R-L), PY=y=>B-(y/YMAX)*(B-T);
+
+  const MC=q=>1.5*q*q-12*q+40, AVC=q=>0.5*q*q-6*q+40, ATC=q=>F/q+AVC(q), AFC=q=>F/q;
+
+  const QA_MIN = 6, AVC_MIN = AVC(QA_MIN); // = 22 exactly, F-independent
+
+  function minATC(F){
+    let q = 8;
+    for(let i=0;i<60;i++){
+      const g  = q*q*q - 6*q*q - F;
+      const gp = 3*q*q - 12*q;
+      if(Math.abs(gp) < 1e-9) break;
+      const qn = q - g/gp;
+      if(!isFinite(qn) || qn<=0) break;
+      if(Math.abs(qn-q) < 1e-10){ q = qn; break; }
+      q = qn;
+    }
+    q = clamp(q, QMIN, QMAX);
+    return [q, F/q + AVC(q)];
+  }
+
+  function qOnRisingMC(P){
+    const q = (12 + Math.sqrt(Math.max(0, 6*P - 96))) / 3;
+    return Math.min(q, QMAX);
+  }
+
+  function txt(x,y,s,o){let e=el('text',Object.assign({x,y,'font-size':12,fill:'#64748B','font-weight':700,'font-family':'Arial'},o||{}));e.textContent=s;return e;}
+
+  function ensureClip(){
+    const defs=el('defs',{});
+    const cp=document.createElementNS(NS,'clipPath'); cp.setAttribute('id','plotClip'); defs.appendChild(cp);
+    const r=document.createElementNS(NS,'rect');
+    r.setAttribute('x',L); r.setAttribute('y',T); r.setAttribute('width',R-L); r.setAttribute('height',B-T);
+    cp.appendChild(r);
+  }
+
+  function curve(fn,col,w,dash,qStart,qEnd){
+    qStart = qStart==null?QMIN:qStart; qEnd = qEnd==null?QMAX:qEnd;
+    const samples=80, pts=[];
+    for(let i=0;i<=samples;i++){
+      const q=qStart+(qEnd-qStart)*(i/samples);
+      let y=fn(q);
+      y=clamp(y,-5,YMAX*1.5);
+      pts.push([PX(q),PY(y)]);
+    }
+    const at={d:smoothPath(pts),fill:'none',stroke:col,'stroke-width':w,'stroke-linejoin':'round','stroke-linecap':'round','clip-path':'url(#plotClip)'};
+    if(dash) at['stroke-dasharray']=dash;
+    el('path',at);
+  }
+
+  function markMin(q,y,curveColor){
+    const x=PX(q), yy=PY(y), stub=9;
+    el('line',{x1:x,y1:yy,x2:x,y2:Math.min(yy+stub,B),stroke:'#94A3B8','stroke-width':1,'stroke-dasharray':'2 2',opacity:0.85});
+    el('line',{x1:Math.max(x-stub,L),y1:yy,x2:x,y2:yy,stroke:'#94A3B8','stroke-width':1,'stroke-dasharray':'2 2',opacity:0.85});
+    el('circle',{cx:x,cy:yy,r:6,fill:'none',stroke:'#4F46E5','stroke-width':1.4,opacity:0.75});
+    el('circle',{cx:x,cy:yy,r:3,fill:curveColor,stroke:'#fff','stroke-width':1.2});
+  }
+
+  const PROFIT_COL='#0D9488', LOSS_COL='#DC2626';
+  function shadeProfitLoss(qstar, P, atcq, isProfit){
+    if(qstar<=0 || atcq==null) return;
+    const xL = PX(0), xR = PX(qstar);
+    const yHigh = PY(Math.max(P, atcq));
+    const yLow  = PY(Math.min(P, atcq));
+    if(yLow - yHigh < 0.5) return;
+    el('rect',{x:xL, y:yHigh, width:(xR-xL), height:(yLow-yHigh), fill:isProfit?PROFIT_COL:LOSS_COL, opacity:0.12});
+  }
+
+  function drawAxes(){
+    el('line',{x1:L,y1:B,x2:R,y2:B,stroke:'#0F172A','stroke-width':2});
+    el('line',{x1:L,y1:B,x2:L,y2:T,stroke:'#0F172A','stroke-width':2});
+    el('path',{d:`M${R} ${B} l-9 -5 l0 10 z`,fill:'#0F172A'});
+    el('path',{d:`M${L} ${T} l-5 9 l10 0 z`,fill:'#0F172A'});
+    txt(R-4,B+36,'Quantity (q)',{'text-anchor':'end','font-size':14,fill:'#334155'});
+    txt(L-6,T+2,'$/unit',{'text-anchor':'end','font-size':14,fill:'#334155'});
+  }
+
+  function placeEndLabels(){
+    const raw = [
+      {name:'MC',  val:MC(QMAX),                     color:'#4F46E5'},
+      {name:'ATC', val:Math.min(ATC(QMAX),YMAX*1.5),  color:'#0F172A'},
+      {name:'AVC', val:AVC(QMAX),                     color:'#0F766E'}
+    ];
+    raw.forEach(it=>{ it.py = PY(clamp(it.val,0,YMAX)) - 6; });
+    raw.sort((a,b)=>a.py-b.py);
+    const MIN_GAP=15;
+    for(let i=1;i<raw.length;i++){
+      if(raw[i].py - raw[i-1].py < MIN_GAP) raw[i].py = raw[i-1].py + MIN_GAP;
+    }
+    raw.forEach(it=>{ it.py = clamp(it.py, T+12, B-6); });
+    raw.forEach(it=> txt(PX(QMAX)-2, it.py, it.name, {fill:it.color,'text-anchor':'end','font-size':13}) );
+  }
+
+  function renderCostMode(qstar,P,atcq,qt,atcMin){
+    if (qstar>0) shadeProfitLoss(qstar, P, atcq, P > atcq);
+
+    curve(AFC,'#94A3B8',2.2,'5 4');
+    curve(AVC,'#0F766E',2.6);
+    curve(ATC,'#0F172A',3);
+    curve(MC,'#4F46E5',3.2);
+    placeEndLabels();
+
+    markMin(QA_MIN, AVC_MIN, '#0F766E');
+    markMin(qt, atcMin, '#0F172A');
+
+    el('line',{x1:L,y1:PY(P),x2:R,y2:PY(P),stroke:'#B45309','stroke-width':2.4,'stroke-dasharray':'7 4'});
+    txt(R-2, clamp(PY(P)-6, T+12, B-4), 'P', {fill:'#B45309','text-anchor':'end','font-size':13});
+
+    if (qstar > 0) {
+      const labelX = clamp(PX(qstar), L+22, R-22);
+      el('line',{x1:PX(qstar),y1:B,x2:PX(qstar),y2:PY(P),stroke:'#CBD5E1','stroke-width':1.4,'stroke-dasharray':'4 4'});
+      el('circle',{cx:PX(qstar),cy:PY(P),r:6,fill:'#B45309',stroke:'#fff','stroke-width':2});
+      txt(labelX,B+18,'q*',{'text-anchor':'middle','font-size':12,fill:'#0F172A'});
+    }
+  }
+
+  function renderSupplyMode(qstar,P){
+    const x0=PX(0), xKink=PX(QA_MIN), yShut=PY(AVC_MIN), yBottom=B;
+
+    el('line',{x1:x0,y1:yBottom,x2:x0,y2:yShut,stroke:'#4F46E5','stroke-width':3.2,'stroke-linecap':'round'});
+    el('line',{x1:x0,y1:yShut,x2:xKink,y2:yShut,stroke:'#4F46E5','stroke-width':1.4,'stroke-dasharray':'3 3',opacity:0.5});
+    curve(MC,'#4F46E5',3.2,null,QA_MIN,QMAX);
+    txt(PX(QMAX)-2,clamp(PY(MC(QMAX))-6,T+12,B-6),'Supply',{fill:'#4F46E5','text-anchor':'end','font-size':13});
+
+    el('circle',{cx:x0,cy:yShut,r:3,fill:'#0F766E',stroke:'#fff','stroke-width':1.2});
+    el('circle',{cx:xKink,cy:yShut,r:3,fill:'#0F766E',stroke:'#fff','stroke-width':1.2});
+
+    el('line',{x1:L,y1:PY(P),x2:R,y2:PY(P),stroke:'#B45309','stroke-width':2.4,'stroke-dasharray':'7 4'});
+    txt(R-2, clamp(PY(P)-6, T+12, B-4), 'P', {fill:'#B45309','text-anchor':'end','font-size':13});
+
+    const qx=PX(qstar), labelX=clamp(qx, L+22, R-22);
+    el('line',{x1:qx,y1:B,x2:qx,y2:PY(P),stroke:'#CBD5E1','stroke-width':1.4,'stroke-dasharray':'4 4'});
+    el('circle',{cx:qx,cy:PY(P),r:6,fill:'#B45309',stroke:'#fff','stroke-width':2});
+    txt(labelX,B+18, qstar>0?'q*':'q* = 0',{'text-anchor':'middle','font-size':12,fill:'#0F172A'});
+  }
+
+  function draw(){
+    svg.innerHTML='';
+    ensureClip();
+
+    const [qt, atcMin] = minATC(F);
+    const EPS = 0.5;
+    let status, qstar, atcq, profit;
+
+    if (P <= AVC_MIN) {
+      status  = 'SHUT DOWN';
+      qstar   = 0;
+      atcq    = null;
+      profit  = -F;
+    } else {
+      qstar  = qOnRisingMC(P);
+      atcq   = ATC(qstar);
+      profit = (P - atcq) * qstar;
+      if (P > atcMin + EPS)      status = 'PROFIT';
+      else if (P < atcMin - EPS) status = 'LOSS (but operating)';
+      else                        status = 'BREAK-EVEN';
+    }
+
+    drawAxes();
+    if(mode==='cost') renderCostMode(qstar,P,atcq,qt,atcMin);
+    else               renderSupplyMode(qstar,P);
+
+    $('qv').textContent   = qstar > 0 ? qstar.toFixed(1) : '0';
+    $('atcv').textContent = atcq!=null ? atcq.toFixed(0) : '–';
+    let pe=$('prof');
+    pe.textContent = (profit<0?'−':'') + Math.abs(profit).toFixed(0);
+    pe.style.color = profit>=0 ? 'var(--pos)' : 'var(--neg)';
+
+    let se=$('status');
+    se.textContent = status;
+    se.style.color = (status==='SHUT DOWN' || status.startsWith('LOSS')) ? 'var(--neg)' : status==='PROFIT' ? 'var(--pos)' : 'var(--acc-d)';
+
+    say(status, AVC_MIN, atcMin, mode);
+  }
+
+  function say(status,minAVC,minATC,mode){
+    const c=$('callout');
+    if(mode==='supply'){
+      if(status==='SHUT DOWN')
+        c.innerHTML=`<b>P ≤ min AVC (${minAVC.toFixed(0)}).</b> Quantity supplied = 0 — the firm won't produce at a price that fails to cover variable cost.`;
+      else
+        c.innerHTML=`<b>P above min AVC.</b> The firm supplies q* where P = MC. This traces out exactly the rising branch of MC shown above — that segment <i>is</i> the short-run supply curve.`;
+      return;
+    }
+    if(status==='SHUT DOWN')
+      c.innerHTML=`<b>P ≤ min AVC (${minAVC.toFixed(0)}).</b> Even the best output can't cover variable cost, so the firm shuts down: <b>q* = 0</b>. It still loses exactly its fixed cost (F) — same as if it produced nothing.`;
+    else if(status==='BREAK-EVEN')
+      c.innerHTML=`<b>P ≈ min ATC (${minATC.toFixed(1)}).</b> The firm covers all costs at q* — roughly zero economic profit. This is the long-run competitive point.`;
+    else if(status==='PROFIT')
+      c.innerHTML=`<b>P &gt; min ATC.</b> The firm produces where P = MC and earns positive profit — the shaded rectangle shows (P − ATC) × q*.`;
+    else
+      c.innerHTML=`<b>min AVC &lt; P &lt; min ATC.</b> The firm loses money but still produces q* &gt; 0 — the shaded rectangle shows the loss, (ATC − P) × q*. It still beats shutting down.`;
+  }
+
+  // ---- Smooth animation: eases live F,P toward slider/preset targets ----
+  function animateStep(){
+    const k = 0.18; // easing factor — higher = snappier, lower = floatier
+    F += (targetF - F) * k;
+    P += (targetP - P) * k;
+    if (Math.abs(targetF - F) < 0.05) F = targetF;
+    if (Math.abs(targetP - P) < 0.05) P = targetP;
+    draw();
+    if (F !== targetF || P !== targetP) {
+      rafId = requestAnimationFrame(animateStep);
+    } else {
+      rafId = null;
+    }
+  }
+  function goTo(newF, newP){
+    targetF = newF; targetP = newP;
+    if (!rafId) rafId = requestAnimationFrame(animateStep);
+  }
+
+  function bind(name, which){
+    const inp=$(name);
+    inp.addEventListener('input', e=>{
+      const v=+e.target.value;
+      $(name+'L').textContent = e.target.value;
+      if (which==='f') goTo(v, targetP);
+      else              goTo(targetF, v);
+    });
+  }
+  bind('f','f'); bind('p','p');
+
+  [['Reset',100,60],['High price',100,95],['Shutdown',100,22],['Break-even',100,36]].forEach(pr=>{
+    let bt=document.createElement('button');bt.className='preset';bt.textContent=pr[0];
+    bt.onclick=()=>{
+      $('f').value=pr[1]; $('p').value=pr[2];
+      $('fL').textContent=pr[1]; $('pL').textContent=pr[2];
+      goTo(pr[1], pr[2]);
+    };
+    $('presets').appendChild(bt);});
+
+  const modeBtns = root.querySelectorAll('.modeBtn');
+  modeBtns.forEach(b=>b.addEventListener('click',()=>{
+    mode = b.dataset.mode;
+    modeBtns.forEach(x=>x.classList.toggle('active', x===b));
+    root.classList.toggle('mode-supply', mode==='supply');
+    $('cardTitle').textContent = mode==='cost' ? 'Per-unit cost & price' : "Firm's short-run supply curve";
+    draw();
+  }));
+
+  draw();
+})();
+</script>
+</body>
+</html>
